@@ -1,21 +1,134 @@
 @import "tailwindcss";
 
 :root {
+  /* Default Blush Rose Theme (Free) */
   --background: #fffaf8;
   --foreground: #333333;
   --primary: #f8c6d0;
   --secondary: #fef5f7;
   --accent: #ff6b9d;
+  
+  /* Theme variables */
+  --theme-primary: var(--primary);
+  --theme-secondary: var(--secondary);
+  --theme-accent: var(--accent);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
+  --color-primary: var(--theme-primary);
+  --color-secondary: var(--theme-secondary);
+  --color-accent: var(--theme-accent);
   --font-sans: var(--font-inter);
   --font-display: var(--font-playfair);
+}
+
+/* Royal Blue Theme */
+.theme-royal-blue {
+  --theme-primary: #2563EB;
+  --theme-secondary: #EFF6FF;
+  --theme-accent: #1E40AF;
+}
+
+/* Emerald Green Theme */
+.theme-emerald-green {
+  --theme-primary: #059669;
+  --theme-secondary: #ECFDF5;
+  --theme-accent: #047857;
+}
+
+/* Purple Glow Theme */
+.theme-purple-glow {
+  --theme-primary: #7C3AED;
+  --theme-secondary: #F5F3FF;
+  --theme-accent: #5B21B6;
+}
+
+/* Sunset Orange Theme */
+.theme-sunset-orange {
+  --theme-primary: #F97316;
+  --theme-secondary: #FFF7ED;
+  --theme-accent: #EA580C;
+}
+
+/* Teal Ocean Theme */
+.theme-teal-ocean {
+  --theme-primary: #0D9488;
+  --theme-secondary: #F0FDFA;
+  --theme-accent: #0F766E;
+}
+
+/* Hot Pink Theme */
+.theme-hot-pink {
+  --theme-primary: #EC4899;
+  --theme-secondary: #FDF2F8;
+  --theme-accent: #DB2777;
+}
+
+/* Coffee Brown Theme */
+.theme-coffee-brown {
+  --theme-primary: #92400E;
+  --theme-secondary: #FEF3C7;
+  --theme-accent: #78350F;
+}
+
+/* Dark Mode Pro Theme */
+.theme-dark-mode-pro {
+  --theme-primary: #0F172A;
+  --theme-secondary: #1E293B;
+  --theme-accent: #38BDF8;
+}
+
+/* Mint Fresh Theme */
+.theme-mint-fresh {
+  --theme-primary: #22C55E;
+  --theme-secondary: #F0FDF4;
+  --theme-accent: #16A34A;
+}
+
+/* Soft Lavender Theme */
+.theme-soft-lavender {
+  --theme-primary: #A78BFA;
+  --theme-secondary: #F5F3FF;
+  --theme-accent: #7C3AED;
+}
+
+/* Utility classes for dynamic theming */
+.text-theme-primary {
+  color: var(--theme-primary);
+}
+
+.bg-theme-primary {
+  background-color: var(--theme-primary);
+}
+
+.border-theme-primary {
+  border-color: var(--theme-primary);
+}
+
+.text-theme-accent {
+  color: var(--theme-accent);
+}
+
+.bg-theme-accent {
+  background-color: var(--theme-accent);
+}
+
+.border-theme-accent {
+  border-color: var(--theme-accent);
+}
+
+.text-theme-secondary {
+  color: var(--theme-secondary);
+}
+
+.bg-theme-secondary {
+  background-color: var(--theme-secondary);
+}
+
+.border-theme-secondary {
+  border-color: var(--theme-secondary);
 }
 
 body {
@@ -25,50 +138,62 @@ body {
   overflow-x: hidden;
 }
 
+.theme-container {
+  color: var(--foreground);
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Apply theme variables to base elements */
+.theme-container * {
+  --tw-text-opacity: 1;
+  --tw-bg-opacity: 1;
+  --tw-border-opacity: 1;
+}
+
 * {
   box-sizing: border-box;
 }
 
 input:focus, button:focus {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--theme-accent);
   outline-offset: 2px;
 }
 
 /* Custom utilities */
 .gradient-bg {
-  background: linear-gradient(135deg, #fffaf8 0%, #fef5f7 100%);
+  background: linear-gradient(135deg, var(--background) 0%, var(--secondary) 100%);
 }
 
 .pastel-shadow {
-  box-shadow: 0 10px 30px rgba(248, 198, 208, 0.15);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
 /* Shopping zone - highlighted product area */
 .shopping-zone {
-  background: #fef7f8;
-  border: 1px solid rgba(253, 164, 175, 0.35);
-  box-shadow: 0 4px 28px rgba(251, 113, 133, 0.06);
+  background: color-mix(in srgb, var(--secondary) 80%, var(--background) 20%);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 4px 28px color-mix(in srgb, var(--accent) 6%, transparent);
 }
 
 .hero-gradient {
-  background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(254,245,247,0.7) 100%);
+  background: linear-gradient(90deg, color-mix(in srgb, white 90%, var(--background) 10%) 0%, color-mix(in srgb, var(--secondary) 70%, white 30%) 100%);
 }
 
 /* Swiper styles */
 .swiper-pagination-bullet {
-  background: #f8c6d0 !important;
+  background: var(--primary) !important;
   opacity: 0.5 !important;
 }
 
 .swiper-pagination-bullet-active {
-  background: #ff6b9d !important;
+  background: var(--accent) !important;
   opacity: 1 !important;
   transform: scale(1.2);
 }
 
 .swiper-button-next,
 .swiper-button-prev {
-  color: #ff6b9d !important;
+  color: var(--accent) !important;
   width: 40px !important;
   height: 40px !important;
   border-radius: 0 !important;
@@ -160,16 +285,16 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #fffaf8;
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f8c6d0;
+  background: var(--primary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff6b9d;
+  background: var(--accent);
 }
 
 /* Product Grid - Line clamp fallback & card polish */
