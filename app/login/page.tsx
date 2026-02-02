@@ -9,6 +9,10 @@ const OTP_PHONE_KEY = 'tb_otp_phone';
 const OTP_EXPIRY_KEY = 'tb_otp_expiry';
 const OTP_ATTEMPTS_KEY = 'tb_otp_attempts';
 
+// --- DEMO ONLY: Fixed OTP for auto-fill. Replace with real backend OTP later. ---
+const DEMO_OTP = '123456';
+const DEMO_OTP_AUTOFILL_DELAY_MS = 1500;
+
 function getRandomExpiryMinutes(): number {
   return Math.floor(Math.random() * (5 - 2 + 1) + 2);
 }
@@ -16,7 +20,8 @@ function getRandomExpiryMinutes(): number {
 async function sendOtp(phone: string) {
   await new Promise(resolve => setTimeout(resolve, 1000));
   if (!/^\d{10}$/.test(phone)) return { success: false, message: 'Please enter a valid 10-digit mobile number' };
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // Demo only: use fixed OTP so auto-fill can verify. Replace with: Math.floor(100000 + Math.random() * 900000).toString()
+  const otp = DEMO_OTP;
   const expiryMinutes = getRandomExpiryMinutes();
   const expiryTime = Date.now() + expiryMinutes * 60 * 1000;
   localStorage.setItem(OTP_STORAGE_KEY, otp);
@@ -77,9 +82,14 @@ export default function LoginPage() {
   const [otpError, setOtpError] = useState<string>('');
   const [seconds, setSeconds] = useState(180);
   const [isExpired, setIsExpired] = useState(false);
+  const [demoOtpAutoFilled, setDemoOtpAutoFilled] = useState(false);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const demoAutofillTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { clearOtpData(); }, []);
+  useEffect(() => () => {
+    if (demoAutofillTimeoutRef.current) clearTimeout(demoAutofillTimeoutRef.current);
+  }, []);
   useEffect(() => {
     if (seconds > 0 && !isLoading && step === 'otp') {
       const timer = setInterval(() => {
@@ -106,9 +116,18 @@ export default function LoginPage() {
       if (response.success) {
         setStep('otp');
         setOtp('');
+        setDemoOtpAutoFilled(false);
         setOtpError('');
         setSeconds((response.expiryMinutes ?? 3) * 60);
         setIsExpired(false);
+        // Demo only: auto-fill OTP after short delay. Remove when using real backend OTP.
+        if (demoAutofillTimeoutRef.current) clearTimeout(demoAutofillTimeoutRef.current);
+        demoAutofillTimeoutRef.current = setTimeout(() => {
+          setOtp(DEMO_OTP);
+          setDemoOtpAutoFilled(true);
+          otpInputRefs.current[5]?.focus();
+          demoAutofillTimeoutRef.current = null;
+        }, DEMO_OTP_AUTOFILL_DELAY_MS);
       } else {
         setPhoneError(response.message || 'Failed to send OTP. Please try again.');
       }
@@ -128,6 +147,7 @@ export default function LoginPage() {
 
   const handleResendOtp = async () => {
     setError(''); setOtpError(''); setOtp('');
+    setDemoOtpAutoFilled(false);
     if (!validatePhone(phone)) { setStep('phone'); return; }
     setIsLoading(true);
     try {
@@ -135,6 +155,14 @@ export default function LoginPage() {
       if (response.success) {
         setSeconds((response.expiryMinutes ?? 3) * 60);
         setIsExpired(false);
+        // Demo only: re-auto-fill OTP after delay.
+        if (demoAutofillTimeoutRef.current) clearTimeout(demoAutofillTimeoutRef.current);
+        demoAutofillTimeoutRef.current = setTimeout(() => {
+          setOtp(DEMO_OTP);
+          setDemoOtpAutoFilled(true);
+          otpInputRefs.current[5]?.focus();
+          demoAutofillTimeoutRef.current = null;
+        }, DEMO_OTP_AUTOFILL_DELAY_MS);
       } else {
         setOtpError(response.message || 'Failed to resend OTP. Please try again.');
       }
@@ -142,7 +170,11 @@ export default function LoginPage() {
   };
 
   const handleBackToPhone = () => {
-    setStep('phone'); setOtp(''); setOtpError(''); clearOtpData();
+    if (demoAutofillTimeoutRef.current) {
+      clearTimeout(demoAutofillTimeoutRef.current);
+      demoAutofillTimeoutRef.current = null;
+    }
+    setStep('phone'); setOtp(''); setOtpError(''); setDemoOtpAutoFilled(false); clearOtpData();
   };
 
   const formatTime = (secs: number) => `${Math.floor(secs / 60)}:${(secs % 60).toString().padStart(2, '0')}`;
@@ -203,6 +235,9 @@ export default function LoginPage() {
                     ))}
                   </div>
                   {otpError && <p className="mt-2 text-sm text-red-600 text-center" role="alert">{otpError}</p>}
+                  {demoOtpAutoFilled && (
+                    <p className="mt-1.5 text-xs text-gray-500 text-center">Demo OTP auto-filled for convenience.</p>
+                  )}
                 </div>
 
                 {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg"><p className="text-sm text-red-600">{error}</p></div>}
