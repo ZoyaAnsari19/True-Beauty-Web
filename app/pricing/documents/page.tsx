@@ -159,20 +159,20 @@ export default function DocumentsPage() {
       <div className="container mx-auto px-4 md:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <Link href="/pricing/addons" className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <div className="flex items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <Link href="/pricing/addons" className="p-2 rounded-lg hover:bg-gray-100 transition-colors shrink-0" aria-label="Back to add-ons">
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-playfair font-bold text-gray-800">Upload Required Documents</h1>
-              <p className="text-gray-600 mt-1">Please provide the necessary documents for your {selectedPlan} subscription</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-playfair font-bold text-gray-800">Upload Required Documents</h1>
+              <p className="text-gray-600 mt-1 text-sm sm:text-base">Please provide the necessary documents for your {selectedPlan} subscription</p>
             </div>
           </div>
 
           {/* Progress Indicator */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Document Upload Progress</h3>
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800">Document Upload Progress</h3>
               <span className="text-sm font-medium text-gray-600">
                 {getUploadedCount()} of {getTotalRequired()} required documents
               </span>
@@ -199,74 +199,75 @@ export default function DocumentsPage() {
           </div>
 
           {/* Documents List */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-            <div className="space-y-8">
+          <div className="bg-white rounded-2xl p-4 sm:p-8 shadow-sm border border-gray-100">
+            <div className="space-y-6 sm:space-y-8">
               {['business', 'identity', 'financial'].map(type => {
                 const docsOfType = documents.filter(doc => doc.type === type);
                 if (docsOfType.length === 0) return null;
                 
                 return (
                   <div key={type}>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
                       {getDocumentIcon(type)}
                       {getDocumentTypeLabel(type)}
                     </h3>
                     
                     <div className="space-y-4">
                       {docsOfType.map((doc) => (
-                        <div key={doc.id} className="border border-gray-200 rounded-xl p-6">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
-                                <h4 className="text-lg font-medium text-gray-800">{doc.name}</h4>
-                                {doc.required && (
-                                  <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
-                                    Required
-                                  </span>
-                                )}
-                              </div>
-                              
-                              {doc.uploaded ? (
-                                <div className="flex items-center gap-3 mt-3 p-3 bg-green-50 rounded-lg">
+                        <div key={doc.id} className="border border-gray-200 rounded-xl p-4 sm:p-6">
+                          <div className="block">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <h4 className="text-base sm:text-lg font-medium text-gray-800">{doc.name}</h4>
+                              {doc.required && (
+                                <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full shrink-0">
+                                  Required
+                                </span>
+                              )}
+                            </div>
+                            
+                            {doc.uploaded ? (
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-3 p-3 bg-green-50 rounded-lg border border-green-100">
+                                <div className="flex items-center gap-3 min-w-0 flex-1">
                                   <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-green-700 font-medium truncate">{doc.fileName}</p>
-                                    <p className="text-green-600 text-sm">
+                                  <div className="min-w-0 flex-1 overflow-hidden">
+                                    <p className="text-green-700 font-medium truncate" title={doc.fileName}>{doc.fileName}</p>
+                                    <p className="text-green-600 text-xs sm:text-sm mt-0.5">
                                       Uploaded on {new Date(doc.uploadDate || '').toLocaleDateString()}
                                     </p>
                                   </div>
-                                  <button
-                                    onClick={() => removeDocument(doc.id)}
-                                    className="text-red-500 hover:text-red-700 p-1"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </button>
                                 </div>
-                              ) : (
-                                <div className="mt-3">
-                                  <button
-                                    onClick={() => handleFileSelect(doc.id)}
-                                    disabled={isUploading && selectedDocumentId === doc.id}
-                                    className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50"
-                                  >
-                                    <Upload className="w-4 h-4" />
-                                    {isUploading && selectedDocumentId === doc.id ? 'Uploading...' : 'Upload Document'}
-                                  </button>
-                                  
-                                  {isUploading && selectedDocumentId === doc.id && (
-                                    <div className="mt-3">
-                                      <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div 
-                                          className="bg-rose-500 h-2 rounded-full transition-all duration-300"
-                                          style={{ width: `${uploadProgress}%` }}
-                                        ></div>
-                                      </div>
-                                      <p className="text-sm text-gray-600 mt-1">{uploadProgress}% uploaded</p>
+                                <button
+                                  onClick={() => removeDocument(doc.id)}
+                                  className="self-start sm:self-center text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0"
+                                  aria-label="Remove document"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="mt-3">
+                                <button
+                                  onClick={() => handleFileSelect(doc.id)}
+                                  disabled={isUploading && selectedDocumentId === doc.id}
+                                  className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 text-sm sm:text-base"
+                                >
+                                  <Upload className="w-4 h-4 shrink-0" />
+                                  {isUploading && selectedDocumentId === doc.id ? 'Uploading...' : 'Upload Document'}
+                                </button>
+                                
+                                {isUploading && selectedDocumentId === doc.id && (
+                                  <div className="mt-3">
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                      <div 
+                                        className="bg-rose-500 h-2 rounded-full transition-all duration-300"
+                                        style={{ width: `${uploadProgress}%` }}
+                                      ></div>
                                     </div>
-                                  )}
-                                </div>
-                              )}
-                            </div>
+                                    <p className="text-xs sm:text-sm text-gray-600 mt-1">{uploadProgress}% uploaded</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -278,10 +279,10 @@ export default function DocumentsPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
             <Link
               href="/pricing/addons"
-              className="flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center"
+              className="w-full sm:flex-1 py-3 px-6 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-center"
             >
               Back to Add-ons
             </Link>
@@ -289,7 +290,7 @@ export default function DocumentsPage() {
             <button
               onClick={handleContinue}
               disabled={!isAllRequiredUploaded()}
-              className="flex-1 bg-rose-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full sm:flex-1 bg-rose-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               Proceed to Payment
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
