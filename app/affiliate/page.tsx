@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { DollarSign, Package, Users, Wallet, Copy, Check, AlertCircle, Calendar, Filter, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 type ActiveSection = 'products' | 'users' | 'withdraw' | null;
 type WithdrawalStatus = 'pending' | 'processing' | 'paid' | 'rejected';
 
 const dummyProducts = [
-  { id: 1, name: 'True Beauty Day Cream', image: '/images/products/dayCream.png', price: 2074.17, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/day-cream?ref=ABC123' },
-  { id: 2, name: 'True Beauty Night Cream', image: '/images/products/nightCream.png', price: 2406.17, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/night-cream?ref=ABC123' },
-  { id: 3, name: 'True Beauty Serum', image: '/images/products/serum.png', price: 2904.17, commission: 20, affiliateLink: 'https://truebeauty.com/affiliate/serum?ref=ABC123' },
-  { id: 4, name: 'True Beauty Sunscreen', image: '/images/products/sunscreen.png', price: 1908.17, commission: 12, affiliateLink: 'https://truebeauty.com/affiliate/sunscreen?ref=ABC123' },
-  { id: 5, name: 'True Beauty Face Wash', image: '/images/products/faceWash.png', price: 1576.17, commission: 10, affiliateLink: 'https://truebeauty.com/affiliate/face-wash?ref=ABC123' },
-  { id: 6, name: 'True Beauty Moisturizer', image: '/images/products/moisturizer.png', price: 2240.17, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/moisturizer?ref=ABC123' }
+  { id: 1, name: 'True Beauty Day Cream', image: '/images/products/dayCream.png', price: 1299, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/day-cream?ref=ABC123' },
+  { id: 2, name: 'True Beauty Night Cream', image: '/images/products/nightCream.png', price: 1399, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/night-cream?ref=ABC123' },
+  { id: 3, name: 'True Beauty Serum', image: '/images/products/serum.png', price: 1499, commission: 20, affiliateLink: 'https://truebeauty.com/affiliate/serum?ref=ABC123' },
+  { id: 4, name: 'True Beauty Sunscreen', image: '/images/products/sunscreen.png', price: 1199, commission: 12, affiliateLink: 'https://truebeauty.com/affiliate/sunscreen?ref=ABC123' },
+  { id: 5, name: 'True Beauty Face Wash', image: '/images/products/faceWash.png', price: 999, commission: 10, affiliateLink: 'https://truebeauty.com/affiliate/face-wash?ref=ABC123' },
+  { id: 6, name: 'True Beauty Moisturizer', image: '/images/products/moisturizer.png', price: 1399, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/moisturizer?ref=ABC123' }
 ];
 
 const dummyUsers = [
@@ -106,8 +109,15 @@ export default function AffiliatePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-24 pb-12">
-      <div className="container mx-auto px-4 md:px-8">
+    <div className="min-h-screen gradient-bg mt-5">
+      <Header />
+      <div className="pt-24 pb-12">
+        <div className="container mx-auto px-4 md:px-8">
+        <div className="md:hidden mb-4">
+          <Link href="/" className="inline-flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+          </Link>
+        </div>
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-playfair font-bold text-gray-800 mb-2">Affiliate Dashboard</h1>
           <p className="text-gray-600">Manage your affiliate program and track earnings</p>
@@ -118,7 +128,14 @@ export default function AffiliatePage() {
             const IconComponent = card.icon;
             const isClickable = card.id !== 'earnings';
             return (
-              <button key={card.id} onClick={() => isClickable && setActiveSection(card.id as ActiveSection)} disabled={!isClickable} className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-6 text-left ${isClickable ? 'cursor-pointer hover:-translate-y-1' : 'cursor-default'} ${!isClickable ? 'opacity-90' : ''}`}>
+              <button
+                key={card.id}
+                onClick={() => isClickable && setActiveSection(card.id as ActiveSection)}
+                disabled={!isClickable}
+                className={`bg-white/90 border border-rose-100 rounded-xl shadow-sm hover:shadow-md hover:border-rose-200 transition-all duration-300 p-6 text-left ${
+                  isClickable ? 'cursor-pointer hover:-translate-y-1' : 'cursor-default'
+                } ${!isClickable ? 'opacity-90' : ''}`}
+              >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${card.color} flex items-center justify-center`}>
                     <IconComponent className="w-6 h-6 text-white" />
@@ -134,7 +151,7 @@ export default function AffiliatePage() {
 
         <div className="mt-8">
           {activeSection === 'products' && (
-            <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+            <div className="bg-white/95 border border-rose-100 rounded-2xl shadow-sm p-6 md:p-8">
               <div className="mb-6">
                 <h2 className="text-2xl md:text-3xl font-playfair font-bold text-gray-800 mb-2">Listed Products</h2>
                 <p className="text-gray-600">Copy your affiliate links and start earning</p>
@@ -148,30 +165,49 @@ export default function AffiliatePage() {
           )}
 
           {activeSection === 'users' && (
-            <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+            <div className="bg-white/95 border border-rose-100 rounded-2xl shadow-sm p-6 md:p-8">
               <div className="mb-6">
                 <h2 className="text-2xl md:text-3xl font-playfair font-bold text-gray-800 mb-2">Affiliated Users</h2>
                 <p className="text-gray-600">Track your network and their earnings</p>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div className="hidden md:block overflow-x-auto border border-gray-200 rounded-lg">
+                <table className="w-full border-collapse">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Name</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Phone</th>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 border-r border-gray-200">Name</th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 border-r border-gray-200">Phone</th>
                       <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Earnings</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {dummyUsers.map((user) => (
-                      <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td className="py-4 px-4 text-gray-800 font-medium">{user.name}</td>
-                        <td className="py-4 px-4 text-gray-600">{maskPhone(user.phone)}</td>
+                    {dummyUsers.map((user, index) => (
+                      <tr key={user.id} className={`border-b border-gray-200 hover:bg-gray-50 transition-colors ${index === dummyUsers.length - 1 ? 'border-b-0' : ''}`}>
+                        <td className="py-4 px-4 text-gray-800 font-medium border-r border-gray-200">{user.name}</td>
+                        <td className="py-4 px-4 text-gray-600 border-r border-gray-200">{maskPhone(user.phone)}</td>
                         <td className="py-4 px-4 text-right text-gray-800 font-semibold">{user.hasPurchased ? `₹${user.earnings.toFixed(2)}` : <span className="text-gray-400 italic">purchasing</span>}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div className="md:hidden space-y-4">
+                {dummyUsers.map((user) => (
+                  <div key={user.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <p className="font-bold text-lg text-gray-800 mb-1">{user.name}</p>
+                        <p className="text-sm text-gray-600 flex items-center gap-1"><Users className="w-4 h-4" />{maskPhone(user.phone)}</p>
+                      </div>
+                      <div className="text-right">
+                        {user.hasPurchased ? (
+                          <p className="font-bold text-lg text-gray-800">₹{user.earnings.toFixed(2)}</p>
+                        ) : (
+                          <span className="text-gray-400 italic text-sm">purchasing</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
               <div className="mt-6 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <p className="text-sm text-gray-600">Total Earnings from Users: <span className="font-bold text-gray-800">₹{totalEarnings.toFixed(2)}</span></p>
@@ -181,7 +217,7 @@ export default function AffiliatePage() {
           )}
 
           {activeSection === 'withdraw' && (
-            <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+            <div className="bg-white/95 border border-rose-100 rounded-2xl shadow-sm p-6 md:p-8">
               <div className="mb-6">
                 <h2 className="text-2xl md:text-3xl font-playfair font-bold text-gray-800 mb-2">Withdraw Funds & History</h2>
                 <p className="text-gray-600">Request a withdrawal from your affiliate earnings</p>
@@ -266,7 +302,7 @@ export default function AffiliatePage() {
               )}
 
               {!showKYC && (
-                <div className="mt-8">
+                <div className="mt-8 pt-8 border-t border-gray-200">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                     <div>
                       <h3 className="text-xl md:text-2xl font-playfair font-bold text-gray-800 mb-1">Withdrawal History</h3>
@@ -337,12 +373,14 @@ export default function AffiliatePage() {
           )}
 
           {activeSection === null && (
-            <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
+            <div className="bg-white/95 border border-rose-100 rounded-2xl shadow-sm p-12 text-center">
               <p className="text-gray-600">Select a card above to view details</p>
             </div>
           )}
         </div>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }
@@ -357,7 +395,7 @@ function ProductCard({ product }: { product: { id: number; name: string; image: 
     } catch {}
   };
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
+    <div className="bg-white/95 border border-rose-100 rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
       <div className="relative h-40 sm:h-44 shrink-0 overflow-hidden bg-rose-50/60">
         <img src={product.image} alt={product.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out" />
       </div>

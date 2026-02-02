@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Heart, ShoppingBag, Star, ArrowLeft, X } from 'lucide-react';
 import Link from 'next/link';
-import ThemeSelector from '../../components/ThemeSelector';
+import Header from '../../../components/Header';
+import Footer from '../../../components/Footer';
 
 interface Product {
   id: number;
@@ -24,12 +25,12 @@ const categories = [
 ];
 
 const products: Product[] = [
-  { id: 1, name: 'Vitamin C Glow Serum', image: '/images/products/serum-1.jpg', price: 899, originalPrice: 1200, rating: 4.8, highlight: 'Brightening & Antioxidant' },
-  { id: 2, name: 'Hydra-Boost Moisturizer', image: '/images/products/moisturizer-1.jpg', price: 649, originalPrice: 850, rating: 4.7, highlight: '24hr Hydration' },
-  { id: 3, name: 'Rose Quartz Roller', image: '/images/products/tool-1.jpg', price: 1299, originalPrice: 1800, rating: 4.9, highlight: 'Facial Massager' },
-  { id: 4, name: 'Lip Plumping Gloss', image: '/images/products/lip-1.jpg', price: 599, originalPrice: 750, rating: 4.6, highlight: 'Hydrating & Shiny' },
-  { id: 5, name: 'Charcoal Face Mask', image: '/images/products/mask-1.jpg', price: 399, originalPrice: 500, rating: 4.5, highlight: 'Deep Cleansing' },
-  { id: 6, name: 'Mineral Foundation', image: '/images/products/foundation-1.jpg', price: 1199, originalPrice: 1500, rating: 4.8, highlight: 'Lightweight Coverage' }
+  { id: 1, name: 'Vitamin C Glow Serum', image: '/images/products/serum-1.jpg', price: 1299, originalPrice: 1699, rating: 4.8, highlight: 'Brightening & Antioxidant' },
+  { id: 2, name: 'Hydra-Boost Moisturizer', image: '/images/products/moisturizer-1.jpg', price: 1199, originalPrice: 1499, rating: 4.7, highlight: '24hr Hydration' },
+  { id: 3, name: 'Rose Quartz Roller', image: '/images/products/tool-1.jpg', price: 1499, originalPrice: 1899, rating: 4.9, highlight: 'Facial Massager' },
+  { id: 4, name: 'Lip Plumping Gloss', image: '/images/products/lip-1.jpg', price: 999, originalPrice: 1299, rating: 4.6, highlight: 'Hydrating & Shiny' },
+  { id: 5, name: 'Charcoal Face Mask', image: '/images/products/mask-1.jpg', price: 999, originalPrice: 1399, rating: 4.5, highlight: 'Deep Cleansing' },
+  { id: 6, name: 'Mineral Foundation', image: '/images/products/foundation-1.jpg', price: 1499, originalPrice: 1899, rating: 4.8, highlight: 'Lightweight Coverage' }
 ];
 
 export default function WishlistPage() {
@@ -45,12 +46,14 @@ export default function WishlistPage() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [wishlist, setWishlist] = useState<Product[]>([]);
+  const [isClient, setIsClient] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setIsClient(true);
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -130,11 +133,13 @@ export default function WishlistPage() {
   };
 
   const isProductInCart = (productId: number) => {
-    if (typeof window === 'undefined') return false;
+    if (!isClient) return false;
     try {
       const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
       return cart.some((item: { productId: number }) => item.productId === productId);
-    } catch { return false; }
+    } catch { 
+      return false; 
+    }
   };
 
   const addToCart = (product: Product) => {
@@ -158,142 +163,7 @@ export default function WishlistPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-white to-purple-50/30">
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'border-b-2 bg-white/95 backdrop-blur-md shadow-sm py-3 border-rose-200' : 'border-b-2 bg-white/80 py-5 border-rose-200'}`}>
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Link href="/" className="flex items-center gap-1">
-                <img src="/images/logo/trueBeauty-Logo.png" alt="True Beauty Logo" width={100} height={30} className="object-contain" />
-                <span className="text-xl font-playfair font-bold text-gray-800 hidden md:block">True Beauty</span>
-              </Link>
-            </div>
-            <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center">
-              <div className="relative">
-                <input type="text" placeholder="Search products..." className="w-96 px-5 py-2.5 pl-11 rounded-full border border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition-all bg-white/80 backdrop-blur-sm text-base" />
-                <svg className="absolute left-4 top-3 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </nav>
-            <div className="hidden lg:flex items-center space-x-4">
-              {isLoggedIn && user ? (
-                <div className="relative" ref={profileDropdownRef}>
-                  <button type="button" onClick={() => setProfileDropdownOpen(!profileDropdownOpen)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                      {displayInitials}
-                    </div>
-                    <span className="hidden md:block text-sm font-medium text-gray-700 max-w-[120px] truncate">
-                      {displayName}
-                    </span>
-                    <svg className={`w-4 h-4 text-gray-500 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {profileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900 truncate">{user.name || user.email}</p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
-                      </div>
-                      <Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        <User className="w-4 h-4 mr-3" />
-                        My Profile
-                      </Link>
-                      <Link href="/orders" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                        My Orders
-                      </Link>
-                      <Link href="/wishlist" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 bg-rose-50 text-rose-600">
-                        <Heart className="w-4 h-4 mr-3" />
-                        Wishlist
-                      </Link>
-                      <div className="border-t border-gray-100 my-2"></div>
-                      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link href="/login" className="flex items-center gap-2 text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                  <User className="w-5 h-5" />
-                  Login
-                </Link>
-              )}
-              <ThemeSelector />
-              <Link href="/affiliate" className="text-gray-700 hover:text-pink-500 transition-colors font-medium">Affiliate</Link>
-              <Link href="/cart" className="flex items-center gap-2 text-gray-700 hover:text-pink-500 transition-colors font-medium relative">
-                <ShoppingBag className="w-5 h-5" />
-                Cart
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-2">
-              <div className="w-6 h-6 flex flex-col justify-center items-center">
-                <span className={`block w-6 h-0.5 bg-gray-700 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1' : ''}`}></span>
-                <span className={`block w-6 h-0.5 bg-gray-700 my-1 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-                <span className={`block w-6 h-0.5 bg-gray-700 transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1' : ''}`}></span>
-              </div>
-            </button>
-          </div>
-        </div>
-        {isMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
-            <div className="container mx-auto px-4 py-4">
-              <div className="space-y-3">
-                <div className="relative">
-                  <input type="text" placeholder="Search products..." className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100" />
-                  <svg className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                {isLoggedIn && user ? (
-                  <div className="px-4 py-2">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white font-semibold">
-                        {displayInitials}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">{displayName}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
-                      </div>
-                    </div>
-                    <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-700 py-2">
-                      <User className="w-5 h-5" />Profile
-                    </Link>
-                    <Link href="/orders" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-700 py-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
-                      My Orders
-                    </Link>
-                    <Link href="/wishlist" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-700 py-2 bg-rose-50 text-rose-600 rounded-lg">
-                      <Heart className="w-5 h-5" />Wishlist
-                    </Link>
-                  </div>
-                ) : (
-                  <Link href="/login" className="text-left px-4 py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium block" onClick={() => setIsMenuOpen(false)}>
-                    <User className="inline mr-2 w-4 h-4" />Login
-                  </Link>
-                )}
-                <Link href="/affiliate" className="text-left px-4 py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium block" onClick={() => setIsMenuOpen(false)}>Affiliate</Link>
-                <Link href="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center px-4 py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                  <ShoppingBag className="mr-2 w-5 h-5" />Cart ({cartCount})
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      <Header />
 
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-8">
@@ -389,6 +259,7 @@ export default function WishlistPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

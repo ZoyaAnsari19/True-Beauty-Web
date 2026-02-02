@@ -104,8 +104,8 @@ export default function AddonsPage() {
   const calculateTotal = () => {
     const planPrices: Record<string, number> = {
       'Starter': 999,
-      'Professional': 2499,
-      'Enterprise': 4999
+      'Professional': 1499,
+      'Enterprise': 1999
     };
     
     const planPrice = planPrices[selectedPlan] || 0;
@@ -124,8 +124,8 @@ export default function AddonsPage() {
 
   const planPrices: Record<string, number> = {
     'Starter': 999,
-    'Professional': 2499,
-    'Enterprise': 4999
+    'Professional': 1499,
+    'Enterprise': 1999
   };
 
   return (

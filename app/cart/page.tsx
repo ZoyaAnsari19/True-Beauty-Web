@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ThemeSelector from '../../components/ThemeSelector';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 import Link from 'next/link';
-import { ArrowLeft, ShoppingBag, Trash2, Minus, Plus } from 'lucide-react';
+import { ShoppingBag, Trash2, Minus, Plus, ArrowLeft } from 'lucide-react';
 
 type CartItem = { id: number; name: string; price: number; image: string; quantity: number };
 
@@ -38,25 +39,14 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen gradient-bg">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b-2 border-rose-200 py-4">
-        <div className="container mx-auto px-4 md:px-8 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-gray-700 hover:text-pink-500 transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Back</span>
-          </Link>
-          <div className="flex items-center space-x-2">
-            <ShoppingBag className="w-6 h-6 text-rose-500" />
-            <span className="text-lg font-playfair font-bold text-gray-800">My Cart</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <ThemeSelector />
-            <div className="w-20" />
-          </div>
-        </div>
-      </header>
-
-      <main className="pt-28 pb-16 px-4 md:px-8">
+      <Header />
+      <main className="pt-24 pb-16 px-4 md:px-8">
         <div className="container mx-auto max-w-4xl">
+          <div className="md:hidden mb-4">
+            <Link href="/" className="inline-flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </Link>
+          </div>
           {cartItems.length === 0 ? (
             <div className="text-center py-16">
               <ShoppingBag className="w-20 h-20 text-rose-200 mx-auto mb-4" />
@@ -104,7 +94,7 @@ export default function CartPage() {
                   <span className="text-lg font-medium text-gray-700">Subtotal</span>
                   <span className="text-xl font-bold text-gray-800">₹{subtotal.toFixed(2)}</span>
                 </div>
-                <Link href="/shipping" className="block w-full bg-rose-500 text-white py-3 rounded-lg font-medium text-center hover:bg-rose-600 transition-colors">
+                <Link href="/cart/shipping" className="block w-full bg-rose-500 text-white py-3 rounded-lg font-medium text-center hover:bg-rose-600 transition-colors">
                   Proceed to Checkout
                 </Link>
                 <Link href="/" className="block w-full mt-3 py-2.5 text-center text-rose-600 font-medium hover:text-rose-700 transition-colors">
@@ -115,6 +105,7 @@ export default function CartPage() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -1,63 +1,22 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import ThemeSelector from '../../components/ThemeSelector';
-import { Check, ArrowRight, Star, Users, Zap, Shield } from 'lucide-react';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import { Check, ArrowRight, Star, Users, Zap, Shield, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { getThemeById } from '../../utils/themeUtils';
 
 export default function PricingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [isAffiliate, setIsAffiliate] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
   const [themeToPurchase, setThemeToPurchase] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const profileDropdownRef = useRef<HTMLDivElement>(null);
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-
-  const getCartCount = () => {
-    if (typeof window === 'undefined') return 0;
-    try {
-      const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
-      return cart.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 1), 0);
-    } catch { return 0; }
-  };
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    setCartCount(getCartCount());
-  }, []);
-
-  useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('user');
-    const profileData = localStorage.getItem('profile');
     const themePurchase = localStorage.getItem('theme_to_purchase');
-    
-    setIsLoggedIn(!!authToken);
-    if (authToken && userData) {
-      const parsedUser = JSON.parse(userData);
-      const parsedProfile = profileData ? JSON.parse(profileData) : null;
-      setUser({ ...parsedUser, ...parsedProfile });
-      setIsAffiliate(!!localStorage.getItem('isAffiliate') || !!parsedProfile?.isAffiliate);
-    }
-    
     // Check if user is coming to purchase a theme
     if (themePurchase) {
       setThemeToPurchase(themePurchase);
     }
   }, []);
-
-  const displayName = user?.name || user?.email || `+91 ${user?.phone || ''}`;
-  const displayInitials = user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : user?.email?.[0].toUpperCase() || 'U';
 
   const plans = [
     {
@@ -76,7 +35,7 @@ export default function PricingPage() {
     },
     {
       name: "Professional",
-      price: "₹2,499",
+      price: "₹1,499",
       period: "/month",
       description: "Ideal for growing businesses",
       features: [
@@ -92,7 +51,7 @@ export default function PricingPage() {
     },
     {
       name: "Enterprise",
-      price: "₹4,999",
+      price: "₹1,999",
       period: "/month",
       description: "For large scale operations",
       features: [
@@ -126,164 +85,14 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-white to-purple-50/30">
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'border-b-2 bg-white/95 backdrop-blur-md shadow-sm py-3 border-rose-200' : 'border-b-2 bg-white/80 py-5 border-rose-200'}`}>
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Link href="/" className="flex items-center gap-1">
-                <img src="/images/logo/trueBeauty-Logo.png" alt="True Beauty Logo" width={100} height={30} className="object-contain" />
-                <span className="text-xl font-playfair font-bold text-gray-800 hidden md:block">True Beauty</span>
-              </Link>
-            </div>
-            <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center">
-              <div className="relative">
-                <input type="text" placeholder="Search products..." className="w-96 px-5 py-2.5 pl-11 rounded-full border border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition-all bg-white/80 backdrop-blur-sm text-base" />
-                <svg className="absolute left-4 top-3 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </nav>
-            <div className="hidden lg:flex items-center space-x-4">
-              {isLoggedIn && user ? (
-                <div className="relative" ref={profileDropdownRef}>
-                  <button type="button" onClick={() => setProfileDropdownOpen(!profileDropdownOpen)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                      {displayInitials}
-                    </div>
-                    <span className="hidden md:block text-sm font-medium text-gray-700 max-w-[120px] truncate">
-                      {displayName}
-                    </span>
-                    <svg className={`w-4 h-4 text-gray-500 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {profileDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900 truncate">{user.name || user.email}</p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
-                      </div>
-                      <Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        My Profile
-                      </Link>
-                      <Link href="/orders" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                        My Orders
-                      </Link>
-                      <Link href="/wishlist" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        Wishlist
-                      </Link>
-                      <div className="border-t border-gray-100 my-2"></div>
-                      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link href="/login" className="flex items-center gap-2 text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  Login
-                </Link>
-              )}
-              <Link href="/affiliate" className="text-gray-700 hover:text-pink-500 transition-colors font-medium">Affiliate</Link>
-              <Link href="/cart" className="flex items-center gap-2 text-gray-700 hover:text-pink-500 transition-colors font-medium relative">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                Cart
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-2">
-              <div className="w-6 h-6 flex flex-col justify-center items-center">
-                <span className={`block w-6 h-0.5 bg-gray-700 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1' : ''}`}></span>
-                <span className={`block w-6 h-0.5 bg-gray-700 my-1 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-                <span className={`block w-6 h-0.5 bg-gray-700 transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-1' : ''}`}></span>
-              </div>
-            </button>
-          </div>
-        </div>
-        {isMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
-            <div className="container mx-auto px-4 py-4">
-              <div className="space-y-3">
-                <div className="relative">
-                  <input type="text" placeholder="Search products..." className="w-full px-4 py-2 pl-10 rounded-lg border border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100" />
-                  <svg className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                {isLoggedIn && user ? (
-                  <div className="px-4 py-2">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white font-semibold">
-                        {displayInitials}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">{displayName}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
-                      </div>
-                    </div>
-                    <Link href="/profile" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-700 py-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      Profile
-                    </Link>
-                    <Link href="/orders" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-700 py-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
-                      My Orders
-                    </Link>
-                    <Link href="/wishlist" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-700 py-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      Wishlist
-                    </Link>
-                  </div>
-                ) : (
-                  <Link href="/login" className="text-left px-4 py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium block" onClick={() => setIsMenuOpen(false)}>
-                    <svg className="inline mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    Login
-                  </Link>
-                )}
-                <Link href="/affiliate" className="text-left px-4 py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium block" onClick={() => setIsMenuOpen(false)}>Affiliate</Link>
-                <Link href="/cart" onClick={() => setIsMenuOpen(false)} className="flex items-center px-4 py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                  <svg className="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                  Cart ({cartCount})
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-
-      <main className="pt-24 pb-16">
+    <div className="min-h-screen md:mt-5 bg-gradient-to-b from-rose-50/30 via-white to-purple-50/30">
+      <Header />
+      <div className="md:hidden container mx-auto px-4 pt-20 pb-3">
+        <Link href="/" className="inline-flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <ArrowLeft className="w-5 h-5 text-gray-600" />
+        </Link>
+      </div>
+      <main className="pt-8 md:pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-8">
           {/* Theme Purchase Banner */}
           {themeToPurchase && (
@@ -318,7 +127,7 @@ export default function PricingPage() {
                 key={index} 
                 className={`relative bg-white rounded-2xl border-2 p-8 transition-all duration-300 hover:shadow-xl ${
                   plan.popular 
-                    ? 'border-rose-500 shadow-lg scale-105' 
+                    ? 'border-rose-500 shadow-lg scale-105 mt-4 md:mt-0' 
                     : 'border-gray-200 hover:border-rose-300'
                 }`}
               >
@@ -396,6 +205,7 @@ export default function PricingPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

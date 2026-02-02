@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react';
 import { themes, applyTheme as applyThemeUtil } from '../utils/themeUtils';
 
+interface ThemeSelectorProps {
+  onClose?: () => void;
+}
 
-export default function ThemeSelector() {
+export default function ThemeSelector({ onClose }: ThemeSelectorProps) {
   const [currentTheme, setCurrentTheme] = useState<string>('blush-rose');
   const [previewTheme, setPreviewTheme] = useState<string | null>(null);
   const [purchasedThemes, setPurchasedThemes] = useState<string[]>(['blush-rose']);
@@ -30,6 +33,9 @@ export default function ThemeSelector() {
     } else {
       applyTheme(savedTheme);
     }
+    
+    // Dispatch custom event for header update on initial load
+    window.dispatchEvent(new Event('themeChanged'));
     
     // If there's a theme to purchase from previous session, redirect to pricing
     if (themeToPurchase && window.location.pathname !== '/pricing') {
@@ -62,6 +68,9 @@ export default function ThemeSelector() {
     applyTheme(themeId);
     localStorage.setItem('preview_theme', themeId);
     
+    // Dispatch custom event for header update
+    window.dispatchEvent(new Event('themeChanged'));
+    
     console.log(`Previewing theme: ${theme.name}`);
   };
 
@@ -80,6 +89,9 @@ export default function ThemeSelector() {
       localStorage.removeItem('preview_theme');
       localStorage.removeItem('previous_theme');
     }
+    
+    // Dispatch custom event for header update
+    window.dispatchEvent(new Event('themeChanged'));
     
     // Show success feedback
     console.log(`Applied theme: ${theme.name}`);
@@ -106,6 +118,9 @@ export default function ThemeSelector() {
     localStorage.removeItem('preview_theme');
     localStorage.removeItem('previous_theme');
     localStorage.removeItem('theme_to_purchase');
+    
+    // Dispatch custom event for header update
+    window.dispatchEvent(new Event('themeChanged'));
     
     console.log('Preview cancelled, reverted to previous theme');
   };
@@ -142,29 +157,36 @@ export default function ThemeSelector() {
         </div>
       )}
 
-      {/* Theme Selector Button */}
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative"
-        aria-label="Change theme"
-      >
-        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-        </svg>
-        {previewTheme && (
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-white"></span>
-        )}
-      </button>
+      {/* Theme Selector Button - Only show if not controlled externally */}
+      {!onClose && (
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative"
+          aria-label="Change theme"
+        >
+          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+          </svg>
+          {previewTheme && (
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-white"></span>
+          )}
+        </button>
+      )}
 
       {/* Theme Selector Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+      {(isModalOpen || onClose) && (
+        <>
+          {!onClose && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setIsModalOpen(false)}></div>}
+          <div className={`${onClose ? '' : 'fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none'}`}>
+            <div className={`bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl pointer-events-auto ${onClose ? '' : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Theme Marketplace</h2>
                 <button 
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    onClose?.();
+                  }}
                   className="text-gray-500 hover:text-gray-700 text-2xl w-8 h-8 flex items-center justify-center"
                 >
                   ×
@@ -183,11 +205,11 @@ export default function ThemeSelector() {
                   return (
                     <div
                       key={theme.id}
-                      className={`relative p-5 rounded-xl border-2 transition-all duration-300 ${{
-                        'border-theme-accent bg-theme-secondary shadow-lg': isApplied || isPreviewing,
-                        'border-gray-200 hover:border-theme-primary hover:shadow-md': !isApplied && !isPreviewing,
-                        'opacity-75': theme.isPremium && !isPurchased && !isPreviewing
-                      }}`}
+                      className={`relative p-5 rounded-xl border-2 transition-all duration-300 ${
+                        (isApplied || isPreviewing) 
+                          ? 'border-theme-accent bg-theme-secondary shadow-lg' 
+                          : 'border-gray-200 hover:border-theme-primary hover:shadow-md'
+                      } ${theme.isPremium && !isPurchased && !isPreviewing ? 'opacity-75' : ''}`}
                     >
                       {/* Theme Preview Colors */}
                       <div className="flex gap-2 mb-4">
@@ -279,8 +301,9 @@ export default function ThemeSelector() {
                 })}
               </div>
             </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

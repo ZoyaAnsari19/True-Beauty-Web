@@ -67,12 +67,12 @@ export default function SubscribePage() {
 
   const planPrices: Record<string, string> = {
     'Starter': '₹999',
-    'Professional': '₹2,499',
-    'Enterprise': '₹4,999'
+    'Professional': '₹1,499',
+    'Enterprise': '₹1,999'
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-white to-purple-50/30 pt-24 pb-16">
+    <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-white to-purple-50/30 pt-20 md:pt-24 pb-16">
       <div className="container mx-auto px-4 md:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
