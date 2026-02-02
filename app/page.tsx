@@ -52,6 +52,7 @@ const categories = [
 export default function Home() {
   const [wishlist, setWishlist] = useState<number[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [cartVersion, setCartVersion] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
@@ -65,6 +66,7 @@ export default function Home() {
     if (existing) existing.quantity += 1;
     else cart.push({ ...product, quantity: 1 });
     localStorage.setItem('tb_cart', JSON.stringify(cart));
+    setCartVersion((v) => v + 1);
   };
 
   const isProductInCart = (productId: number) => {
