@@ -214,7 +214,7 @@ export default function WishlistPage() {
                       <h3 className="font-playfair font-semibold text-gray-800 text-base leading-tight line-clamp-2">
                         {product.name}
                       </h3>
-                      <p className="text-gray-500 text-xs mt-0.5 line-clamp-1">{product.highlight}</p>
+                      <p className="text-rose-600 text-xs font-medium mt-0.5 line-clamp-1">{product.highlight}</p>
                       <div className="flex items-center gap-1.5 mt-2">
                         <div className="flex">
                           {[1, 2, 3, 4, 5].map((star) => (

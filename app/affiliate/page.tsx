@@ -7,7 +7,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
 type ActiveSection = 'products' | 'users' | 'withdraw' | null;
-type WithdrawalStatus = 'pending' | 'processing' | 'paid' | 'rejected';
+type WithdrawalStatus = 'pending' | 'paid' | 'rejected';
 
 const dummyProducts = [
   { id: 1, name: 'True Beauty Day Cream', image: '/images/products/dayCream.png', price: 1299, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/day-cream?ref=ABC123' },
@@ -29,7 +29,7 @@ const dummyUsers = [
 
 const dummyWithdrawals: { id: string; amount: number; date: string; status: WithdrawalStatus; remarks: string }[] = [
   { id: 'wd_001', amount: 50000, date: '2026-01-28', status: 'paid', remarks: 'Successfully transferred to bank account' },
-  { id: 'wd_002', amount: 25000, date: '2026-01-25', status: 'processing', remarks: 'Under review by finance team' },
+  { id: 'wd_002', amount: 25000, date: '2026-01-25', status: 'pending', remarks: 'Under review by finance team' },
   { id: 'wd_003', amount: 75000, date: '2026-01-22', status: 'paid', remarks: 'Successfully transferred to bank account' },
   { id: 'wd_004', amount: 30000, date: '2026-01-20', status: 'rejected', remarks: 'KYC documents incomplete. Please resubmit.' },
   { id: 'wd_005', amount: 100000, date: '2026-01-18', status: 'paid', remarks: 'Successfully transferred to bank account' },
@@ -44,8 +44,8 @@ const maskPhone = (phone: string): string => {
 };
 
 const getStatusBadge = (status: WithdrawalStatus) => {
-  const styles = { pending: 'bg-yellow-50 text-yellow-700 border-yellow-200', processing: 'bg-blue-50 text-blue-700 border-blue-200', paid: 'bg-green-50 text-green-700 border-green-200', rejected: 'bg-red-50 text-red-700 border-red-200' };
-  const labels = { pending: 'Pending', processing: 'Processing', paid: 'Paid', rejected: 'Rejected' };
+  const styles = { pending: 'bg-yellow-50 text-yellow-700 border-yellow-200', paid: 'bg-green-50 text-green-700 border-green-200', rejected: 'bg-red-50 text-red-700 border-red-200' };
+  const labels = { pending: 'Pending', paid: 'Paid', rejected: 'Rejected' };
   return <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${styles[status]}`}>{labels[status]}</span>;
 };
 
@@ -104,8 +104,7 @@ export default function AffiliatePage() {
   const cards = [
     { id: 'products', title: 'Listed Products', value: '24', icon: Package, color: 'from-blue-500 to-blue-600' },
     { id: 'users', title: 'Affiliated Users', value: '156', icon: Users, color: 'from-green-500 to-green-600' },
-    { id: 'earnings', title: 'Total Earnings', value: '₹10,33,350', icon: DollarSign, color: 'from-purple-500 to-purple-600' },
-    { id: 'withdraw', title: 'Withdraw', value: '₹2,65,600', icon: Wallet, color: 'from-rose-500 to-rose-600' }
+    { id: 'withdraw', title: 'Withdrawal & History', value: '₹2,65,600', icon: Wallet, color: 'from-rose-500 to-rose-600' }
   ];
 
   return (
@@ -118,29 +117,36 @@ export default function AffiliatePage() {
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </Link>
         </div>
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-playfair font-bold text-gray-800 mb-2">Affiliate Dashboard</h1>
-          <p className="text-gray-600">Manage your affiliate program and track earnings</p>
+        <div className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-playfair font-bold text-gray-800 mb-2">Affiliate Dashboard</h1>
+            <p className="text-gray-600">Manage your affiliate program and track earnings</p>
+          </div>
+          <div className="bg-white/95 border border-rose-100 rounded-xl shadow-sm p-5 md:p-6 flex items-center gap-4 min-w-0 md:min-w-[280px]">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+              <DollarSign className="w-6 h-6 text-white" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-gray-600 text-sm font-medium mb-0.5">Total Earnings</p>
+              <p className="text-2xl md:text-3xl font-bold text-gray-800">₹10,33,350</p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {cards.map((card) => {
             const IconComponent = card.icon;
-            const isClickable = card.id !== 'earnings';
             return (
               <button
                 key={card.id}
-                onClick={() => isClickable && setActiveSection(card.id as ActiveSection)}
-                disabled={!isClickable}
-                className={`bg-white/90 border border-rose-100 rounded-xl shadow-sm hover:shadow-md hover:border-rose-200 transition-all duration-300 p-6 text-left ${
-                  isClickable ? 'cursor-pointer hover:-translate-y-1' : 'cursor-default'
-                } ${!isClickable ? 'opacity-90' : ''}`}
+                onClick={() => setActiveSection(card.id as ActiveSection)}
+                className="bg-white/90 border border-rose-100 rounded-xl shadow-sm hover:shadow-md hover:border-rose-200 transition-all duration-300 p-6 text-left cursor-pointer hover:-translate-y-1"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${card.color} flex items-center justify-center`}>
                     <IconComponent className="w-6 h-6 text-white" />
                   </div>
-                  {isClickable && <span className="text-xs text-gray-500 font-medium">Click to view</span>}
+                  <span className="text-xs text-gray-500 font-medium">Click to view</span>
                 </div>
                 <h3 className="text-gray-600 text-sm font-medium mb-1">{card.title}</h3>
                 <p className="text-2xl md:text-3xl font-bold text-gray-800">{card.value}</p>
@@ -176,7 +182,7 @@ export default function AffiliatePage() {
                     <tr className="border-b border-gray-200 bg-gray-50">
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 border-r border-gray-200">Name</th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 border-r border-gray-200">Phone</th>
-                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Earnings</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Earnings Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -184,7 +190,7 @@ export default function AffiliatePage() {
                       <tr key={user.id} className={`border-b border-gray-200 hover:bg-gray-50 transition-colors ${index === dummyUsers.length - 1 ? 'border-b-0' : ''}`}>
                         <td className="py-4 px-4 text-gray-800 font-medium border-r border-gray-200">{user.name}</td>
                         <td className="py-4 px-4 text-gray-600 border-r border-gray-200">{maskPhone(user.phone)}</td>
-                        <td className="py-4 px-4 text-right text-gray-800 font-semibold">{user.hasPurchased ? `₹${user.earnings.toFixed(2)}` : <span className="text-gray-400 italic">purchasing</span>}</td>
+                        <td className="py-4 px-4 text-right text-gray-800 font-semibold">{user.hasPurchased ? `₹${user.earnings.toFixed(2)}` : <span className="text-gray-500 italic">not purchased</span>}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -202,7 +208,7 @@ export default function AffiliatePage() {
                         {user.hasPurchased ? (
                           <p className="font-bold text-lg text-gray-800">₹{user.earnings.toFixed(2)}</p>
                         ) : (
-                          <span className="text-gray-400 italic text-sm">purchasing</span>
+                          <span className="text-gray-500 italic text-sm">not purchased</span>
                         )}
                       </div>
                     </div>
@@ -313,7 +319,6 @@ export default function AffiliatePage() {
                       <select value={withdrawFilterStatus} onChange={(e) => setWithdrawFilterStatus(e.target.value as WithdrawalStatus | 'all')} className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white">
                         <option value="all">All Status</option>
                         <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
                         <option value="paid">Paid</option>
                         <option value="rejected">Rejected</option>
                       </select>
@@ -403,7 +408,9 @@ function ProductCard({ product }: { product: { id: number; name: string; image: 
         <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">{product.name}</h3>
         <div className="flex items-center justify-between mb-3">
           <span className="text-lg font-bold text-gray-800">₹{product.price.toFixed(2)}</span>
-          <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded">{product.commission}% commission</span>
+          <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded">
+            {product.commission}% commission (₹{(product.price * product.commission / 100).toFixed(2)})
+          </span>
         </div>
         <div className="space-y-2 mt-auto">
           <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">

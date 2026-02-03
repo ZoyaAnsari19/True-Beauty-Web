@@ -1,23 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import ThemeSelector from './ThemeSelector';
 import Link from 'next/link';
-import { Search, User, ShoppingBag, Menu, X, Grid3x3, Heart, ChevronRight, ChevronDown, ChevronLeft, MapPin, Package, Wallet, LogOut, Palette, DollarSign, Users } from 'lucide-react';
+import { Search, User, ShoppingBag, Menu, X, Grid3x3, Heart, ChevronRight, ChevronDown, ChevronLeft, MapPin, Package, Wallet, LogOut, Palette, IndianRupee, Users } from 'lucide-react';
 import { getThemeById } from '../utils/themeUtils';
-
-const categories = [
-  { id: 1, name: 'Skincare', href: '/category/skincare', items: [{ id: 1, name: 'Face Wash & Cleansers', href: '/category/skincare/cleansers' }, { id: 2, name: 'Moisturizers', href: '/category/skincare/moisturizers' }, { id: 3, name: 'Serums & Essences', href: '/category/skincare/serums' }, { id: 4, name: 'Sunscreen & SPF', href: '/category/skincare/sunscreen' }, { id: 5, name: 'Toners & Mists', href: '/category/skincare/toners' }, { id: 6, name: 'Face Masks', href: '/category/skincare/masks' }, { id: 7, name: 'Eye Care', href: '/category/skincare/eye-care' }, { id: 8, name: 'Anti-Aging', href: '/category/skincare/anti-aging' }] },
-  { id: 2, name: 'Makeup', href: '/category/makeup', items: [{ id: 1, name: 'Foundation & Concealer', href: '/category/makeup/foundation' }, { id: 2, name: 'Lipstick & Lip Care', href: '/category/makeup/lips' }, { id: 3, name: 'Eyeshadow & Palettes', href: '/category/makeup/eyes' }, { id: 4, name: 'Mascara & Eyeliners', href: '/category/makeup/eye-makeup' }, { id: 5, name: 'Blush & Highlighters', href: '/category/makeup/cheeks' }, { id: 6, name: 'Makeup Brushes', href: '/category/makeup/brushes' }, { id: 7, name: 'Setting Sprays', href: '/category/makeup/setting' }, { id: 8, name: 'Makeup Removers', href: '/category/makeup/removers' }] },
-  { id: 3, name: 'Bath & Body', href: '/category/bath-body', items: [{ id: 1, name: 'Body Wash & Soaps', href: '/category/bath-body/cleansers' }, { id: 2, name: 'Body Lotions & Creams', href: '/category/bath-body/moisturizers' }, { id: 3, name: 'Body Scrubs & Exfoliants', href: '/category/bath-body/scrubs' }, { id: 4, name: 'Body Oils', href: '/category/bath-body/oils' }, { id: 5, name: 'Hand & Foot Care', href: '/category/bath-body/hand-foot' }, { id: 6, name: 'Bath Bombs & Salts', href: '/category/bath-body/bath-accessories' }, { id: 7, name: 'Deodorants', href: '/category/bath-body/deodorants' }, { id: 8, name: 'Body Mists', href: '/category/bath-body/mists' }] },
-  { id: 4, name: 'Haircare', href: '/category/haircare', items: [{ id: 1, name: 'Shampoos', href: '/category/haircare/shampoos' }, { id: 2, name: 'Conditioners', href: '/category/haircare/conditioners' }, { id: 3, name: 'Hair Oils & Serums', href: '/category/haircare/oils' }, { id: 4, name: 'Hair Masks & Treatments', href: '/category/haircare/masks' }, { id: 5, name: 'Hair Styling Products', href: '/category/haircare/styling' }, { id: 6, name: 'Hair Accessories', href: '/category/haircare/accessories' }, { id: 7, name: 'Scalp Care', href: '/category/haircare/scalp' }, { id: 8, name: 'Hair Color', href: '/category/haircare/color' }] },
-  { id: 5, name: 'Fragrance', href: '/category/fragrance', items: [{ id: 1, name: 'Perfumes', href: '/category/fragrance/perfumes' }, { id: 2, name: 'Body Mists', href: '/category/fragrance/mists' }, { id: 3, name: 'Eau de Toilette', href: '/category/fragrance/edt' }, { id: 4, name: 'Eau de Parfum', href: '/category/fragrance/edp' }, { id: 5, name: 'Roll-On Perfumes', href: '/category/fragrance/roll-on' }, { id: 6, name: 'Fragrance Gift Sets', href: '/category/fragrance/gift-sets' }, { id: 7, name: 'Scented Candles', href: '/category/fragrance/candles' }, { id: 8, name: 'Room Sprays', href: '/category/fragrance/room-sprays' }] },
-  { id: 6, name: 'Wellness', href: '/category/wellness', items: [{ id: 1, name: 'Vitamins & Supplements', href: '/category/wellness/vitamins' }, { id: 2, name: 'Hair & Skin Gummies', href: '/category/wellness/gummies' }, { id: 3, name: 'Wellness Kits', href: '/category/wellness/kits' }, { id: 4, name: 'Ayurvedic Products', href: '/category/wellness/ayurvedic' }, { id: 5, name: 'Herbal Teas', href: '/category/wellness/teas' }, { id: 6, name: 'Self-Care Essentials', href: '/category/wellness/self-care' }, { id: 7, name: 'Wellness Accessories', href: '/category/wellness/accessories' }, { id: 8, name: 'Gift Sets', href: '/category/wellness/gift-sets' }] },
-  { id: 7, name: 'Gifting', href: '/category/gifting', items: [{ id: 1, name: 'Skincare Gift Sets', href: '/category/gifting/skincare-sets' }, { id: 2, name: 'Makeup Gift Sets', href: '/category/gifting/makeup-sets' }, { id: 3, name: 'Luxury Gift Boxes', href: '/category/gifting/luxury-boxes' }, { id: 4, name: 'Personalized Gifts', href: '/category/gifting/personalized' }, { id: 5, name: 'Holiday Collections', href: '/category/gifting/holiday' }, { id: 6, name: 'Gift Cards', href: '/category/gifting/gift-cards' }, { id: 7, name: 'Corporate Gifting', href: '/category/gifting/corporate' }, { id: 8, name: 'Wedding Favors', href: '/category/gifting/wedding' }] },
-  { id: 8, name: 'Offers', href: '/offers', items: [{ id: 1, name: 'Flash Sales', href: '/offers/flash-sales' }, { id: 2, name: 'Buy 1 Get 1', href: '/offers/bogo' }, { id: 3, name: 'New Arrivals Sale', href: '/offers/new-arrivals' }, { id: 4, name: 'Clearance Sale', href: '/offers/clearance' }, { id: 5, name: 'Combo Offers', href: '/offers/combo' }, { id: 6, name: 'Seasonal Sales', href: '/offers/seasonal' }, { id: 7, name: 'Member Exclusive', href: '/offers/member-exclusive' }, { id: 8, name: 'Bundle Deals', href: '/offers/bundles' }] }
-];
+import { categories } from '../utils/categories';
 
 export default function Header() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -213,7 +205,18 @@ export default function Header() {
                             <div className="w-64 flex-shrink-0 border-r border-gray-200 pr-6">
                               <div className="space-y-1">
                                 {categories.map((category) => (
-                                  <button key={category.id} type="button" onMouseEnter={() => setActiveCategory(category.id)} onClick={() => setActiveCategory(category.id)} className={`w-full text-left px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${activeCategory === category.id ? 'bg-rose-50 text-pink-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}>{category.name}</button>
+                                  <button
+                                    key={category.id}
+                                    type="button"
+                                    onMouseEnter={() => setActiveCategory(category.id)}
+                                    onClick={() => {
+                                      router.push(`/?category=${category.slug}#products`);
+                                      setCategoriesMenuOpen(false);
+                                    }}
+                                    className={`w-full text-left px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${activeCategory === category.id ? 'bg-rose-50 text-pink-600' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
+                                  >
+                                    {category.name}
+                                  </button>
                                 ))}
                               </div>
                             </div>
@@ -228,16 +231,28 @@ export default function Header() {
                                     return (
                                       <div key={colIndex} className="space-y-1">
                                         {columnItems.map((item) => (
-                                          <button key={item.id} type="button" onClick={(e) => { e.preventDefault(); setCategoriesMenuOpen(false); }} className="block w-full text-left px-2 py-1.5 text-sm text-gray-600 hover:text-pink-600 hover:bg-rose-50 rounded-md transition-colors cursor-pointer">{item.name}</button>
+                                          <Link
+                                            key={item.id}
+                                            href={`/?category=${activeCategoryData.slug}&subcategory=${item.slug}#products`}
+                                            onClick={() => setCategoriesMenuOpen(false)}
+                                            className="block w-full text-left px-2 py-1.5 text-sm text-gray-600 hover:text-pink-600 hover:bg-rose-50 rounded-md transition-colors cursor-pointer"
+                                          >
+                                            {item.name}
+                                          </Link>
                                         ))}
                                       </div>
                                     );
                                   })}
                                 </div>
                                 <div className="mt-6 pt-6 border-t border-gray-200">
-                                  <button type="button" onClick={(e) => { e.preventDefault(); setCategoriesMenuOpen(false); }} className="inline-flex items-center text-sm font-medium text-pink-600 hover:text-pink-700 transition-colors cursor-pointer">
-                                    View All {activeCategoryData.name}<ChevronRight className="w-4 h-4 ml-1" />
-                                  </button>
+                                  <Link
+                                    href={activeCategoryData.slug === 'offers' ? '/offers' : `/category/${activeCategoryData.slug}`}
+                                    onClick={() => setCategoriesMenuOpen(false)}
+                                    className="inline-flex items-center text-sm font-medium text-pink-600 hover:text-pink-700 transition-colors cursor-pointer"
+                                  >
+                                    View All {activeCategoryData.name}
+                                    <ChevronRight className="w-4 h-4 ml-1" />
+                                  </Link>
                                 </div>
                               </div>
                             )}
@@ -279,28 +294,22 @@ export default function Header() {
                                   <div className="border-t border-gray-100 bg-gray-50/60">
                                     <div className="flex flex-col py-2">
                                       {category.items.map((item) => (
-                                        <button
+                                        <Link
                                           key={item.id}
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            setCategoriesMenuOpen(false);
-                                          }}
+                                          href={`/?category=${category.slug}&subcategory=${item.slug}#products`}
+                                          onClick={() => setCategoriesMenuOpen(false)}
                                           className="w-full text-left px-5 py-2.5 text-sm text-gray-700 hover:text-pink-600 hover:bg-rose-50 transition-colors"
                                         >
                                           {item.name}
-                                        </button>
+                                        </Link>
                                       ))}
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          setCategoriesMenuOpen(false);
-                                        }}
+                                      <Link
+                                        href={category.slug === 'offers' ? '/offers' : `/category/${category.slug}`}
+                                        onClick={() => setCategoriesMenuOpen(false)}
                                         className="w-full text-left mt-1 px-5 py-3 text-sm font-semibold text-pink-600 hover:text-pink-700 hover:bg-pink-50 border-t border-pink-100 transition-colors"
                                       >
                                         View All {category.name}
-                                      </button>
+                                      </Link>
                                     </div>
                                   </div>
                                 )}
@@ -320,7 +329,7 @@ export default function Header() {
               >
                 <Palette className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />Color Theme
               </button>
-              <Link href="/pricing" className="px-1.5 lg:px-2 xl:px-4 py-1 lg:py-1.5 xl:py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium text-xs lg:text-sm xl:text-base whitespace-nowrap flex items-center gap-1.5 lg:gap-2"><DollarSign className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />Pricing</Link>
+              <Link href="/pricing" className="px-1.5 lg:px-2 xl:px-4 py-1 lg:py-1.5 xl:py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium text-xs lg:text-sm xl:text-base whitespace-nowrap flex items-center gap-1.5 lg:gap-2"><IndianRupee className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />Pricing</Link>
               <Link href="/affiliate" className="px-1.5 lg:px-2 xl:px-4 py-1 lg:py-1.5 xl:py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium text-xs lg:text-sm xl:text-base whitespace-nowrap hidden xl:flex items-center gap-1.5 lg:gap-2"><Users className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />Affiliate</Link>
               <Link href="/cart" className="relative flex items-center p-1 lg:p-1.5 xl:p-2">
                 <ShoppingBag className="w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 text-gray-700 hover:text-pink-500 cursor-pointer transition-colors" />
@@ -398,30 +407,28 @@ export default function Header() {
                           <div className="border-t border-gray-100 bg-gray-50/60">
                             <div className="flex flex-col py-2">
                               {category.items.map((item) => (
-                                <button
+                                <Link
                                   key={item.id}
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.preventDefault();
+                                  href={`/?category=${category.slug}&subcategory=${item.slug}#products`}
+                                  onClick={() => {
                                     setIsMobileCategoriesOpen(false);
                                     setIsMenuOpen(false);
                                   }}
                                   className="w-full text-left px-5 py-2.5 text-sm text-gray-700 hover:text-pink-600 hover:bg-rose-50 transition-colors"
                                 >
                                   {item.name}
-                                </button>
+                                </Link>
                               ))}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
+                              <Link
+                                href={category.slug === 'offers' ? '/offers' : `/category/${category.slug}`}
+                                onClick={() => {
                                   setIsMobileCategoriesOpen(false);
                                   setIsMenuOpen(false);
                                 }}
                                 className="w-full text-left mt-1 px-5 py-3 text-sm font-semibold text-pink-600 hover:text-pink-700 hover:bg-pink-50 border-t border-pink-100 transition-colors"
                               >
                                 View All {category.name}
-                              </button>
+                              </Link>
                             </div>
                           </div>
                         )}
@@ -473,7 +480,7 @@ export default function Header() {
                     className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-gray-700 hover:text-pink-500 hover:bg-white/50 transition-colors font-medium text-sm sm:text-base rounded-md"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5" />
                     Pricing
                   </Link>
                   <Link

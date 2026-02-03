@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { Heart, Star, ShoppingBag, User } from 'lucide-react';
+import { Heart, ShoppingBag, User, Instagram, Facebook, Twitter, Youtube, Mail } from 'lucide-react';
+import ProductGrid from '../components/ProductGrid';
 
 const heroSlides = [
   { id: 1, title: "True Beauty Skincare Collection", tagline: "Premium formulations for radiant, glowing skin. Hydrating mist, serum, foundation & more.", benefits: ["Luxury ingredients & elegant packaging", "Suitable for all skin types", "Minimalist, cruelty-free beauty"], buttonText: "Shop Now", image: "/images/heroSection/allProducts.png", bgColor: "from-rose-50 to-pink-50" },
@@ -19,18 +20,6 @@ const heroSlides = [
   { id: 6, title: "Sun Protection & Lip Care", tagline: "Protect your skin with SPF and nourish your lips with our premium lip balm collection.", benefits: ["Broad spectrum protection", "Nourishing lip care", "Daily essentials"], buttonText: "Shop Now", image: "/images/products/sunscreen.png", bgColor: "from-yellow-50 to-orange-50" }
 ];
 
-const products = [
-  { id: 1, name: "True Beauty Day Cream", highlight: "Bright, fresh & hydrated skin all day", image: "/images/products/dayCream.png", price: 1299, originalPrice: 1699, rating: 4.8, reviewCount: 128 },
-  { id: 2, name: "True Beauty Night Cream", highlight: "Repair & nourish while you sleep", image: "/images/products/nightCream.png", price: 1399, originalPrice: 1799, rating: 4.9, reviewCount: 94 },
-  { id: 3, name: "True Beauty Sunscreen", highlight: "Broad spectrum SPF protection", image: "/images/products/sunscreen.png", price: 1199, originalPrice: 1599, rating: 4.7, reviewCount: 156 },
-  { id: 4, name: "True Beauty Face Wash", highlight: "Gentle cleanser for radiant skin", image: "/images/products/faceWash.png", price: 999, originalPrice: 1399, rating: 4.6, reviewCount: 203 },
-  { id: 5, name: "True Beauty Serum", highlight: "Intensive hydration & glow", image: "/images/products/serum.png", price: 1499, originalPrice: 1899, rating: 4.9, reviewCount: 87 },
-  { id: 6, name: "True Beauty Moisturizer", highlight: "24-hour lasting hydration", image: "/images/products/moisturizer.png", price: 1399, originalPrice: 1799, rating: 4.7, reviewCount: 112 },
-  { id: 7, name: "True Beauty Toner", highlight: "Balance & refine pores", image: "/images/products/toner.png", price: 1099, originalPrice: 1499, rating: 4.5, reviewCount: 76 },
-  { id: 8, name: "True Beauty Face Mask", highlight: "Deep detox & brightening", image: "/images/products/faceMask.png", price: 1199, originalPrice: 1599, rating: 4.8, reviewCount: 145 },
-  { id: 9, name: "True Beauty Lip Balm", highlight: "Nourishing moisture for lips", image: "/images/products/lipBalm.png", price: 999, originalPrice: 1299, rating: 4.9, reviewCount: 234 }
-];
-
 const promotionalSlides = [
   { id: 1, video: "/videos/video1.mp4", headline: "Glow from Within", benefit: "Serums that deliver visible radiance in days", cta: "Shop Serums" },
   { id: 2, video: "/videos/video2.mp4", headline: "Deep Hydration", benefit: "24-hour moisture for plump, dewy skin", cta: "Shop Moisturizers" },
@@ -38,68 +27,20 @@ const promotionalSlides = [
   { id: 4, video: "/videos/video4.mp4", headline: "Protect & Perfect", benefit: "SPF that feels like skincare, never greasy", cta: "Shop Sunscreen" }
 ];
 
-const categories = [
-  { id: 1, name: 'Skincare', href: '/category/skincare', items: [{ id: 1, name: 'Face Wash & Cleansers', href: '/category/skincare/cleansers' }, { id: 2, name: 'Moisturizers', href: '/category/skincare/moisturizers' }, { id: 3, name: 'Serums & Essences', href: '/category/skincare/serums' }, { id: 4, name: 'Sunscreen & SPF', href: '/category/skincare/sunscreen' }, { id: 5, name: 'Toners & Mists', href: '/category/skincare/toners' }, { id: 6, name: 'Face Masks', href: '/category/skincare/masks' }, { id: 7, name: 'Eye Care', href: '/category/skincare/eye-care' }, { id: 8, name: 'Anti-Aging', href: '/category/skincare/anti-aging' }] },
-  { id: 2, name: 'Makeup', href: '/category/makeup', items: [{ id: 1, name: 'Foundation & Concealer', href: '/category/makeup/foundation' }, { id: 2, name: 'Lipstick & Lip Care', href: '/category/makeup/lips' }, { id: 3, name: 'Eyeshadow & Palettes', href: '/category/makeup/eyes' }, { id: 4, name: 'Mascara & Eyeliners', href: '/category/makeup/eye-makeup' }, { id: 5, name: 'Blush & Highlighters', href: '/category/makeup/cheeks' }, { id: 6, name: 'Makeup Brushes', href: '/category/makeup/brushes' }, { id: 7, name: 'Setting Sprays', href: '/category/makeup/setting' }, { id: 8, name: 'Makeup Removers', href: '/category/makeup/removers' }] },
-  { id: 3, name: 'Bath & Body', href: '/category/bath-body', items: [{ id: 1, name: 'Body Wash & Soaps', href: '/category/bath-body/cleansers' }, { id: 2, name: 'Body Lotions & Creams', href: '/category/bath-body/moisturizers' }, { id: 3, name: 'Body Scrubs & Exfoliants', href: '/category/bath-body/scrubs' }, { id: 4, name: 'Body Oils', href: '/category/bath-body/oils' }, { id: 5, name: 'Hand & Foot Care', href: '/category/bath-body/hand-foot' }, { id: 6, name: 'Bath Bombs & Salts', href: '/category/bath-body/bath-accessories' }, { id: 7, name: 'Deodorants', href: '/category/bath-body/deodorants' }, { id: 8, name: 'Body Mists', href: '/category/bath-body/mists' }] },
-  { id: 4, name: 'Haircare', href: '/category/haircare', items: [{ id: 1, name: 'Shampoos', href: '/category/haircare/shampoos' }, { id: 2, name: 'Conditioners', href: '/category/haircare/conditioners' }, { id: 3, name: 'Hair Oils & Serums', href: '/category/haircare/oils' }, { id: 4, name: 'Hair Masks & Treatments', href: '/category/haircare/masks' }, { id: 5, name: 'Hair Styling Products', href: '/category/haircare/styling' }, { id: 6, name: 'Hair Accessories', href: '/category/haircare/accessories' }, { id: 7, name: 'Scalp Care', href: '/category/haircare/scalp' }, { id: 8, name: 'Hair Color', href: '/category/haircare/color' }] },
-  { id: 5, name: 'Fragrance', href: '/category/fragrance', items: [{ id: 1, name: 'Perfumes', href: '/category/fragrance/perfumes' }, { id: 2, name: 'Body Mists', href: '/category/fragrance/mists' }, { id: 3, name: 'Eau de Toilette', href: '/category/fragrance/edt' }, { id: 4, name: 'Eau de Parfum', href: '/category/fragrance/edp' }, { id: 5, name: 'Roll-On Perfumes', href: '/category/fragrance/roll-on' }, { id: 6, name: 'Fragrance Gift Sets', href: '/category/fragrance/gift-sets' }, { id: 7, name: 'Scented Candles', href: '/category/fragrance/candles' }, { id: 8, name: 'Room Sprays', href: '/category/fragrance/room-sprays' }] },
-  { id: 6, name: 'Wellness', href: '/category/wellness', items: [{ id: 1, name: 'Vitamins & Supplements', href: '/category/wellness/vitamins' }, { id: 2, name: 'Hair & Skin Gummies', href: '/category/wellness/gummies' }, { id: 3, name: 'Wellness Kits', href: '/category/wellness/kits' }, { id: 4, name: 'Ayurvedic Products', href: '/category/wellness/ayurvedic' }, { id: 5, name: 'Herbal Teas', href: '/category/wellness/teas' }, { id: 6, name: 'Self-Care Essentials', href: '/category/wellness/self-care' }, { id: 7, name: 'Wellness Accessories', href: '/category/wellness/accessories' }, { id: 8, name: 'Gift Sets', href: '/category/wellness/gift-sets' }] },
-  { id: 7, name: 'Gifting', href: '/category/gifting', items: [{ id: 1, name: 'Skincare Gift Sets', href: '/category/gifting/skincare-sets' }, { id: 2, name: 'Makeup Gift Sets', href: '/category/gifting/makeup-sets' }, { id: 3, name: 'Luxury Gift Boxes', href: '/category/gifting/luxury-boxes' }, { id: 4, name: 'Personalized Gifts', href: '/category/gifting/personalized' }, { id: 5, name: 'Holiday Collections', href: '/category/gifting/holiday' }, { id: 6, name: 'Gift Cards', href: '/category/gifting/gift-cards' }, { id: 7, name: 'Corporate Gifting', href: '/category/gifting/corporate' }, { id: 8, name: 'Wedding Favors', href: '/category/gifting/wedding' }] },
-  { id: 8, name: 'Offers', href: '/offers', items: [{ id: 1, name: 'Flash Sales', href: '/offers/flash-sales' }, { id: 2, name: 'Buy 1 Get 1', href: '/offers/bogo' }, { id: 3, name: 'New Arrivals Sale', href: '/offers/new-arrivals' }, { id: 4, name: 'Clearance Sale', href: '/offers/clearance' }, { id: 5, name: 'Combo Offers', href: '/offers/combo' }, { id: 6, name: 'Seasonal Sales', href: '/offers/seasonal' }, { id: 7, name: 'Member Exclusive', href: '/offers/member-exclusive' }, { id: 8, name: 'Bundle Deals', href: '/offers/bundles' }] }
-];
-
 export default function Home() {
-  const [wishlist, setWishlist] = useState<number[]>([]);
-  const [isClient, setIsClient] = useState(false);
-  const [cartVersion, setCartVersion] = useState(0);
+  const searchParams = useSearchParams();
+  const categorySlug = searchParams.get('category');
 
   useEffect(() => {
-    setIsClient(true);
-    const wishlistData = JSON.parse(localStorage.getItem('tb_wishlist') || '[]');
-    setWishlist(wishlistData);
-  }, []);
-
-  const addToCart = (product: { id: number; name: string; price: number; image: string }) => {
-    const cart: { id: number; name: string; price: number; image: string; quantity: number }[] = JSON.parse(localStorage.getItem('tb_cart') || '[]');
-    const existing = cart.find((p) => p.id === product.id);
-    if (existing) existing.quantity += 1;
-    else cart.push({ ...product, quantity: 1 });
-    localStorage.setItem('tb_cart', JSON.stringify(cart));
-    setCartVersion((v) => v + 1);
-  };
-
-  const isProductInCart = (productId: number) => {
-    if (!isClient) return false;
-    try {
-      const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
-      return cart.some((p: { id: number }) => p.id === productId);
-    } catch { 
-      return false; 
-    }
-  };
-
-  const toggleWishlist = (productId: number) => {
-    if (typeof window === 'undefined') return;
-    try {
-      const currentWishlist = [...wishlist];
-      const index = currentWishlist.indexOf(productId);
-      
-      if (index > -1) {
-        currentWishlist.splice(index, 1);
-      } else {
-        currentWishlist.push(productId);
-      }
-      
-      localStorage.setItem('tb_wishlist', JSON.stringify(currentWishlist));
-      setWishlist(currentWishlist);
-    } catch { }
-  };
+    if (!categorySlug || typeof document === 'undefined') return;
+    const el = document.getElementById('products');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [categorySlug]);
 
   return (
     <div className="min-h-screen gradient-bg">
       <Header />
-      <main className="pt-24 pb-16 md:pt-32 md:pb-24">
+      <main className="pt-24 pb-0 md:pt-32">
       <section className="pb-16 md:pb-24 border-b border-rose-200/60">
         <div className="container mx-auto px-4 md:px-8">
           <Swiper modules={[Autoplay, Pagination, Navigation]} autoplay={{ delay: 5000, disableOnInteraction: false }} pagination={{ clickable: true }} navigation={true} loop={true} className="rounded-3xl overflow-hidden pastel-shadow border border-rose-200/60">
@@ -128,59 +69,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 border-b border-rose-200/60">
+      <section id="products" className="py-16 md:py-24 border-b border-rose-200/60" aria-label="Products">
         <div className="container mx-auto px-4 md:px-8">
-          <div className="text-center mb-10 md:mb-12">
-            <h2 className="text-3xl md:text-4xl font-playfair font-bold text-gray-800 mb-2">Shop Our Collection</h2>
-            <p className="text-gray-600 max-w-xl mx-auto text-sm md:text-base">Premium skincare & beauty essentials crafted for radiant, healthy skin</p>
-          </div>
           <div className="shopping-zone rounded-2xl md:rounded-3xl p-6 md:p-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
-              {products.map((product) => {
-                const discountPercent = Math.round((1 - product.price / product.originalPrice) * 100);
-                return (
-                  <article key={product.id} className="product-card group bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden border border-rose-100/80 flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:shadow-rose-100/40 hover:border-rose-200/80">
-                    <div className="relative h-40 sm:h-44 shrink-0 overflow-hidden bg-rose-50/60">
-                      <img src={product.image} alt={product.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out" />
-                      {discountPercent > 0 && <span className="absolute top-2 left-2 bg-rose-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md">{discountPercent}% OFF</span>}
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleWishlist(product.id);
-                        }}
-                        className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/95 flex items-center justify-center text-rose-500 hover:bg-rose-50 transition-colors duration-300 opacity-0 group-hover:opacity-100 shadow-sm"
-                        aria-label={wishlist.includes(product.id) ? "Remove from wishlist" : "Add to wishlist"}
-                      >
-                        <Heart className={`w-3.5 h-3.5 ${wishlist.includes(product.id) ? 'fill-rose-500' : ''}`} />
-                      </button>
-                    </div>
-                    <div className="flex flex-col flex-1 p-3.5 md:p-4 min-h-0">
-                      <h3 className="font-playfair font-semibold text-gray-800 text-base leading-tight line-clamp-2">{product.name}</h3>
-                      <p className="text-gray-500 text-xs mt-0.5 line-clamp-1">{product.highlight}</p>
-                      <div className="flex items-center gap-1.5 mt-2">
-                        <div className="flex">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className={`w-3 h-3 ${star <= Math.floor(product.rating) ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}`} />
-                          ))}
-                        </div>
-                        <span className="text-[11px] text-gray-500">{product.rating}</span>
-                      </div>
-                      <div className="flex items-baseline gap-2 mt-2">
-                        <span className="text-lg font-bold text-gray-900">₹{product.price.toFixed(2)}</span>
-                        {product.originalPrice > product.price && <span className="text-xs text-gray-400 line-through font-medium">₹{product.originalPrice.toFixed(2)}</span>}
-                      </div>
-                      <div className="mt-3">
-                        {isProductInCart(product.id) ? (
-                        <Link href="/cart" className="w-full bg-rose-600 text-white py-2 px-3 rounded-lg text-xs font-medium hover:bg-rose-700 transition-colors duration-300 flex items-center justify-center gap-1.5"><ShoppingBag className="w-3.5 h-3.5" />Go to Cart</Link>
-                      ) : (
-                        <button onClick={() => addToCart(product)} className="w-full bg-rose-500 text-white py-2 px-3 rounded-lg text-xs font-medium hover:bg-rose-600 transition-colors duration-300 flex items-center justify-center gap-1.5"><ShoppingBag className="w-3.5 h-3.5" />Add to Cart</button>
-                      )}
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+            <ProductGrid subtitle="Premium skincare & beauty essentials crafted for radiant, healthy skin" />
           </div>
         </div>
       </section>
@@ -212,7 +104,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 bg-white/50 border-b border-rose-200/60">
+      <section className="pt-16 pb-8 md:pb-10 bg-white/50 border-b border-rose-200/60">
         <div className="container mx-auto px-4 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[{ icon: Heart, title: "Premium Quality", description: "Luxury formulations with natural ingredients for exceptional results", gradient: "from-pink-400 to-rose-400", delay: "0s" }, { icon: ShoppingBag, title: "Fast Shipping", description: "Free shipping on orders over $50 with express delivery options", gradient: "from-purple-400 to-pink-400", delay: "0.2s" }, { icon: User, title: "Expert Support", description: "Personalized beauty consultations and 24/7 customer care", gradient: "from-rose-400 to-purple-400", delay: "0.4s" }].map((feature, index) => {
@@ -232,7 +124,45 @@ export default function Home() {
       </section>
 
       </main>
+
+      {/* Social media – footer ke upar */}
+      <section className="py-8 md:py-10 bg-gradient-to-b from-white/60 to-rose-50/40 border-t border-rose-200/60">
+        <div className="container mx-auto px-4 md:px-8 text-center">
+          <p className="text-gray-600 text-sm md:text-base mb-6 font-medium">Follow us for beauty tips & offers</p>
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all duration-300 hover:scale-110" aria-label="Instagram">
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all duration-300 hover:scale-110" aria-label="Facebook">
+              <Facebook className="w-5 h-5" />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all duration-300 hover:scale-110" aria-label="Twitter">
+              <Twitter className="w-5 h-5" />
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all duration-300 hover:scale-110" aria-label="YouTube">
+              <Youtube className="w-5 h-5" />
+            </a>
+            <a href="mailto:hello@truebeauty.com" className="w-11 h-11 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all duration-300 hover:scale-110" aria-label="Email">
+              <Mail className="w-5 h-5" />
+            </a>
+          </div>
+        </div>
+      </section>
+
       <Footer />
+
+      {/* Floating WhatsApp – bottom right, direct message */}
+      <a
+        href="https://wa.me/919876543210?text=Hi%2C%20I%20have%20a%20query%20about%20True%20Beauty%20products"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 hover:shadow-xl transition-all duration-300"
+        aria-label="Message us on WhatsApp"
+      >
+        <svg viewBox="0 0 24 24" className="w-7 h-7" fill="currentColor" aria-hidden>
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+      </a>
     </div>
   );
 }

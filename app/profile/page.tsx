@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Link from 'next/link';
-import { Check, Save, Plus, Edit, Trash2, Mail, Shield, Bell, Globe, CheckCircle, XCircle, Clock, Upload, FileText, User, MapPin, ArrowLeft } from 'lucide-react';
+import { Check, Save, Plus, Edit, Trash2, Mail, Shield, Bell, CheckCircle, XCircle, Clock, Upload, FileText, User, MapPin, ArrowLeft } from 'lucide-react';
 
 const categories = [
   { id: 1, name: 'Skincare', href: '/category/skincare', items: [{ id: 1, name: 'Face Wash & Cleansers', href: '/category/skincare/cleansers' }, { id: 2, name: 'Moisturizers', href: '/category/skincare/moisturizers' }, { id: 3, name: 'Serums & Essences', href: '/category/skincare/serums' }, { id: 4, name: 'Sunscreen & SPF', href: '/category/skincare/sunscreen' }, { id: 5, name: 'Toners & Mists', href: '/category/skincare/toners' }, { id: 6, name: 'Face Masks', href: '/category/skincare/masks' }, { id: 7, name: 'Eye Care', href: '/category/skincare/eye-care' }, { id: 8, name: 'Anti-Aging', href: '/category/skincare/anti-aging' }] },
@@ -113,6 +113,8 @@ export default function ProfilePage() {
     setIsEditing(false);
     setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
+    setCompletedSteps(['personal']);
+    setStepperStep('address');
   };
 
   const handleFileUpload = async (type: 'aadhar' | 'pan', file: File) => {
@@ -234,9 +236,6 @@ export default function ProfilePage() {
                 {stepperStep === 'personal' && (
                   <div>
                     <PersonalInfoInline user={user} formData={formData} setFormData={setFormData} isEditing={isEditing} setIsEditing={setIsEditing} isSaving={isSaving} success={success} errors={errors} setErrors={setErrors} emailVerification={emailVerification} setEmailVerification={setEmailVerification} handleSave={handleSavePersonal} validate={validatePersonal} />
-                    <div className="mt-4 sm:mt-6 flex justify-end">
-                      <button onClick={handlePersonalComplete} disabled={!user.name} className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg">Continue to Address</button>
-                    </div>
                   </div>
                 )}
                 {stepperStep === 'address' && (
@@ -258,7 +257,6 @@ export default function ProfilePage() {
                   <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center flex-shrink-0"><User className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" /></div>
                   <div className="flex-1 min-w-0">
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-playfair font-bold text-gray-800 mb-1 sm:mb-2 truncate">{user.name || 'User Profile'}</h1>
-                    <p className="text-sm sm:text-base text-gray-600 mb-1 break-words"><span className="font-medium">Phone:</span> +91 {user.phone || 'N/A'}</p>
                     {user.email && <p className="text-sm sm:text-base text-gray-600 break-words"><span className="font-medium">Email:</span> {user.email}</p>}
                   </div>
                   {isFirstTime && <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 w-full sm:w-auto"><p className="text-xs sm:text-sm text-yellow-800 font-medium text-center sm:text-left">Complete your profile to continue</p></div>}
@@ -268,48 +266,9 @@ export default function ProfilePage() {
                 <div className="lg:col-span-2 space-y-6">
                   <PersonalInfoInline user={user} formData={formData} setFormData={setFormData} isEditing={isEditing} setIsEditing={setIsEditing} isSaving={isSaving} success={success} errors={errors} setErrors={setErrors} emailVerification={emailVerification} setEmailVerification={setEmailVerification} handleSave={handleSavePersonal} validate={validatePersonal} />
                   <KYCSectionInline kycStatus={kycStatus} getStatusIcon={getStatusIcon} getStatusText={getStatusText} getStatusColor={getStatusColor} documents={documents} handleFileUpload={handleFileUpload} isUploading={isUploading} user={user} setUser={setUser} />
-                  {showAddressForm ? <AddressFormInline address={editingAddress} onSave={handleAddressSave} onCancel={() => { setShowAddressForm(false); setEditingAddress(null); }} /> : (
-                    <div id="addresses" className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-rose-100/80 p-4 sm:p-6 md:p-8">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-                        <div>
-                          <h2 className="text-lg sm:text-xl md:text-2xl font-playfair font-bold text-gray-800 mb-1">Saved Addresses</h2>
-                          <p className="text-xs sm:text-sm text-gray-600">{addresses.length} of 5 addresses saved</p>
-                        </div>
-                        <button onClick={() => { setEditingAddress(null); setShowAddressForm(true); }} disabled={addresses.length >= 5} className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"><Plus className="w-4 h-4 sm:w-5 sm:h-5" />Add Address</button>
-                      </div>
-                      {addresses.length === 0 ? (
-                        <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-                          <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-gray-600 mb-2">No addresses saved yet</p>
-                          <p className="text-sm text-gray-500 mb-4">Add your first address to get started</p>
-                          <button onClick={() => setShowAddressForm(true)} className="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors">Add Address</button>
-                        </div>
-                      ) : (
-                        <div className="space-y-3 sm:space-y-4">
-                          {addresses.map((addr, index) => (
-                            <div key={addr.id ?? `address-${index}`} className={`border rounded-lg p-3 sm:p-4 transition-all ${addr.isDefault ? 'border-rose-400 bg-rose-50' : 'border-gray-200 hover:border-gray-300'} ${deletingId === addr.id ? 'opacity-50' : ''}`}>
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap"><MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 flex-shrink-0" /><h3 className="font-semibold text-sm sm:text-base text-gray-800 truncate">{addr.name}</h3>{addr.isDefault && <span className="px-1.5 sm:px-2 py-0.5 bg-rose-500 text-white text-[10px] sm:text-xs font-medium rounded flex-shrink-0">Default</span>}</div>
-                                  <p className="text-xs sm:text-sm text-gray-600 mb-1 break-words">{addr.phone}</p>
-                                  <p className="text-xs sm:text-sm text-gray-700 mb-1 break-words">{addr.addressLine1}{addr.addressLine2 && `, ${addr.addressLine2}`}</p>
-                                  <p className="text-xs sm:text-sm text-gray-700 break-words">{addr.city}, {addr.state} - {addr.pincode}</p>
-                                </div>
-                                <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4 flex-shrink-0">
-                                  {!addr.isDefault && addr.id && <button onClick={() => addr.id && handleSetDefault(addr.id)} className="p-1.5 sm:p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Set as default"><Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>}
-                                  <button onClick={() => { setEditingAddress(addr); setShowAddressForm(true); }} className="p-1.5 sm:p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit address"><Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
-                                  <button onClick={() => addr.id && handleAddressDelete(addr.id)} disabled={deletingId === addr.id} className="p-1.5 sm:p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50" title="Delete address"><Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
                 <div className="lg:col-span-1">
-                  <div className="space-y-4 sm:space-y-6">
+                  <div className="space-y-4 sm:space-y-6 flex flex-col">
                     <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-rose-100/80 p-4 sm:p-6 md:p-8">
                       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"><Shield className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" /><h2 className="text-lg sm:text-xl md:text-2xl font-playfair font-bold text-gray-800">Security</h2></div>
                       <div className="space-y-4">
@@ -321,16 +280,47 @@ export default function ProfilePage() {
                       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"><Bell className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" /><h2 className="text-lg sm:text-xl md:text-2xl font-playfair font-bold text-gray-800">Preferences</h2></div>
                       <div className="space-y-4">
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"><div><p className="text-sm font-medium text-gray-800">Email Notifications</p><p className="text-xs text-gray-600">Receive updates via email</p></div><label className="relative inline-flex items-center cursor-pointer"><input type="checkbox" className="sr-only peer" defaultChecked /><div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div></label></div>
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"><div><p className="text-sm font-medium text-gray-800">SMS Notifications</p><p className="text-xs text-gray-600">Receive updates via SMS</p></div><label className="relative inline-flex items-center cursor-pointer"><input type="checkbox" className="sr-only peer" /><div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div></label></div>
                       </div>
                     </div>
-                    <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-rose-100/80 p-4 sm:p-6 md:p-8">
-                      <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"><Globe className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" /><h2 className="text-lg sm:text-xl md:text-2xl font-playfair font-bold text-gray-800">Language & Region</h2></div>
-                      <div className="space-y-4">
-                        <div><label className="block text-sm font-medium text-gray-700 mb-2">Language</label><select className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-rose-500 focus:border-rose-500 focus:ring-2 focus:outline-none transition-all"><option value="en">English</option><option value="hi">Hindi</option></select></div>
-                        <div><label className="block text-sm font-medium text-gray-700 mb-2">Currency</label><select className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-rose-500 focus:border-rose-500 focus:ring-2 focus:outline-none transition-all"><option value="INR">Indian Rupee (₹)</option><option value="USD">US Dollar ($)</option></select></div>
+                    {showAddressForm ? <AddressFormInline address={editingAddress} onSave={handleAddressSave} onCancel={() => { setShowAddressForm(false); setEditingAddress(null); }} /> : (
+                      <div id="addresses" className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-rose-100/80 p-4 sm:p-6 md:p-8">
+                        <div className="flex flex-row items-center justify-between gap-3 mb-4 sm:mb-6">
+                          <div className="min-w-0 flex-1">
+                            <h2 className="text-lg sm:text-xl md:text-2xl font-playfair font-bold text-gray-800 mb-0.5 sm:mb-1">Saved Addresses</h2>
+                            <p className="text-xs sm:text-sm text-gray-600">{addresses.length} of 5 addresses saved</p>
+                          </div>
+                          <button onClick={() => { setEditingAddress(null); setShowAddressForm(true); }} disabled={addresses.length >= 5} className="flex-shrink-0 flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-sm sm:text-base bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"><Plus className="w-4 h-4 sm:w-5 sm:h-5" />Add</button>
+                        </div>
+                        {addresses.length === 0 ? (
+                          <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+                            <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-600 mb-2">No addresses saved yet</p>
+                            <p className="text-sm text-gray-500 mb-4">Add your first address to get started</p>
+                            <button onClick={() => setShowAddressForm(true)} className="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors">Add</button>
+                          </div>
+                        ) : (
+                          <div className="space-y-3 sm:space-y-4">
+                            {addresses.map((addr, index) => (
+                              <div key={addr.id ?? `address-${index}`} className={`border rounded-lg p-3 sm:p-4 transition-all ${addr.isDefault ? 'border-rose-400 bg-rose-50' : 'border-gray-200 hover:border-gray-300'} ${deletingId === addr.id ? 'opacity-50' : ''}`}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap"><MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 flex-shrink-0" /><h3 className="font-semibold text-sm sm:text-base text-gray-800 truncate">{addr.name}</h3>{addr.isDefault && <span className="px-1.5 sm:px-2 py-0.5 bg-rose-500 text-white text-[10px] sm:text-xs font-medium rounded flex-shrink-0">Default</span>}</div>
+                                    <p className="text-xs sm:text-sm text-gray-600 mb-1 break-words">{addr.phone}</p>
+                                    <p className="text-xs sm:text-sm text-gray-700 mb-1 break-words">{addr.addressLine1}{addr.addressLine2 && `, ${addr.addressLine2}`}</p>
+                                    <p className="text-xs sm:text-sm text-gray-700 break-words">{addr.city}, {addr.state} - {addr.pincode}</p>
+                                  </div>
+                                  <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4 flex-shrink-0">
+                                    {!addr.isDefault && addr.id && <button onClick={() => addr.id && handleSetDefault(addr.id)} className="p-1.5 sm:p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Set as default"><Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>}
+                                    <button onClick={() => { setEditingAddress(addr); setShowAddressForm(true); }} className="p-1.5 sm:p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit address"><Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
+                                    <button onClick={() => addr.id && handleAddressDelete(addr.id)} disabled={deletingId === addr.id} className="p-1.5 sm:p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50" title="Delete address"><Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" /></button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -367,10 +357,10 @@ function PersonalInfoInline(props: any) {
       <div className="space-y-4">
         <div><label className="block text-sm font-medium text-gray-700 mb-2">Full Name <span className="text-red-500">*</span></label><input type="text" value={formData.name} onChange={(e) => { setFormData({ ...formData, name: e.target.value }); if (errors.name) setErrors({ ...errors, name: '' }); }} disabled={!isEditing} className={`w-full px-4 py-3 rounded-lg border ${errors.name ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-rose-500 focus:border-rose-500'} focus:ring-2 focus:outline-none transition-all disabled:bg-gray-50 disabled:cursor-not-allowed`} placeholder="Enter your full name" />{errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}</div>
         <div><label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label><input type="tel" value={`+91 ${user?.phone || ''}`} disabled className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 cursor-not-allowed" /><p className="mt-1 text-xs text-gray-500">Phone number cannot be changed</p></div>
-        <div><label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label><div className="flex gap-2"><div className="flex-1 relative"><Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" /><input type="email" value={formData.email} onChange={(e) => { setFormData({ ...formData, email: e.target.value }); if (errors.email) setErrors({ ...errors, email: '' }); }} disabled={!isEditing || emailVerification.show} className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-rose-500 focus:border-rose-500'} focus:ring-2 focus:outline-none transition-all disabled:bg-gray-50 disabled:cursor-not-allowed`} placeholder="Enter your email address" /></div>{isEditing && formData.email && !emailVerification.show && <button type="button" onClick={() => setEmailVerification({ show: true, newEmail: formData.email, code: '' })} className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium">Verify</button>}</div>{errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}{emailVerification.show && <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg"><p className="text-sm text-blue-800 mb-3">Verification code sent to {emailVerification.newEmail}</p><div className="flex gap-2"><input type="text" value={emailVerification.code} onChange={(e) => setEmailVerification({ ...emailVerification, code: e.target.value })} className="flex-1 px-3 py-2 rounded-lg border border-blue-300 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter verification code" maxLength={6} /><button type="button" onClick={async () => { await new Promise(r => setTimeout(r, 1000)); setEmailVerification({ show: false, newEmail: '', code: '' }); }} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">Verify</button><button type="button" onClick={() => setEmailVerification({ show: false, newEmail: '', code: '' })} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"><span className="text-sm">✕</span></button></div></div>}</div>
+        <div><label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label><div className="relative"><Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" /><input type="email" value={formData.email} onChange={(e) => { setFormData({ ...formData, email: e.target.value }); if (errors.email) setErrors({ ...errors, email: '' }); }} disabled={!isEditing} className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-rose-500 focus:border-rose-500'} focus:ring-2 focus:outline-none transition-all disabled:bg-gray-50 disabled:cursor-not-allowed`} placeholder="Enter your email address" /></div>{errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}</div>
         <div><label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label><input type="date" value={formData.dateOfBirth} onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })} disabled={!isEditing} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-rose-500 focus:border-rose-500 focus:ring-2 focus:outline-none transition-all disabled:bg-gray-50 disabled:cursor-not-allowed" /></div>
-        <div><label className="block text-sm font-medium text-gray-700 mb-2">Gender</label><select value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })} disabled={!isEditing} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-rose-500 focus:border-rose-500 focus:ring-2 focus:outline-none transition-all disabled:bg-gray-50 disabled:cursor-not-allowed"><option value="">Select gender</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option><option value="prefer-not-to-say">Prefer not to say</option></select></div>
-        {isEditing && <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4"><button type="button" onClick={handleSave} disabled={isSaving} className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none flex items-center justify-center gap-2">{isSaving ? <><div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />Saving...</> : <><Save className="w-4 h-4 sm:w-5 sm:h-5" />Save Changes</>}</button><button type="button" onClick={() => { setIsEditing(false); setFormData({ name: user?.name || '', email: user?.email || '', dateOfBirth: user?.dateOfBirth || '', gender: user?.gender || '' }); setErrors({}); setEmailVerification({ show: false, newEmail: '', code: '' }); }} className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 text-gray-700 rounded-lg text-sm sm:text-base font-medium hover:bg-gray-300 transition-colors">Cancel</button></div>}
+        <div><label className="block text-sm font-medium text-gray-700 mb-2">Gender</label><select value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })} disabled={!isEditing} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-rose-500 focus:border-rose-500 focus:ring-2 focus:outline-none transition-all disabled:bg-gray-50 disabled:cursor-not-allowed"><option value="">Select gender</option><option value="male">Male</option><option value="female">Female</option></select></div>
+        {isEditing && <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4"><button type="button" onClick={handleSave} disabled={isSaving} className="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none flex items-center justify-center gap-2">{isSaving ? <><div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />Saving...</> : <><Save className="w-4 h-4 sm:w-5 sm:h-5" />Save & Next</>}</button><button type="button" onClick={() => { setIsEditing(false); setFormData({ name: user?.name || '', email: user?.email || '', dateOfBirth: user?.dateOfBirth || '', gender: user?.gender || '' }); setErrors({}); setEmailVerification({ show: false, newEmail: '', code: '' }); }} className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 text-gray-700 rounded-lg text-sm sm:text-base font-medium hover:bg-gray-300 transition-colors">Cancel</button></div>}
       </div>
     </div>
   );
