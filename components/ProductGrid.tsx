@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Zap, Eye } from 'lucide-react';
@@ -49,6 +49,12 @@ export default function ProductGrid({
     if (categoryFromUrl) return getProductsByCategory(categoryFromUrl, subcategoryFromUrl || undefined);
     return products;
   }, [productsProp, categoryFromUrl, subcategoryFromUrl]);
+
+  useEffect(() => {
+    if (!categoryFromUrl || typeof document === 'undefined') return;
+    const el = document.getElementById('products');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [categoryFromUrl]);
 
   const title = titleProp ?? (categoryFromUrl ? `Showing ${getCategoryNameBySlug(categoryFromUrl)} Products` : 'Shop Our Collection');
   const showSubtitle = subtitle && !categoryFromUrl;

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -27,16 +26,15 @@ const promotionalSlides = [
   { id: 4, video: "/videos/video4.mp4", headline: "Protect & Perfect", benefit: "SPF that feels like skincare, never greasy", cta: "Shop Sunscreen" }
 ];
 
+function ProductsFallback() {
+  return (
+    <div className="min-h-[320px] flex items-center justify-center rounded-2xl bg-white/50 border border-rose-100/80">
+      <p className="text-gray-500 text-sm">Loading products...</p>
+    </div>
+  );
+}
+
 export default function Home() {
-  const searchParams = useSearchParams();
-  const categorySlug = searchParams.get('category');
-
-  useEffect(() => {
-    if (!categorySlug || typeof document === 'undefined') return;
-    const el = document.getElementById('products');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [categorySlug]);
-
   return (
     <div className="min-h-screen gradient-bg">
       <Header />
@@ -72,7 +70,9 @@ export default function Home() {
       <section id="products" className="py-16 md:py-24 border-b border-rose-200/60" aria-label="Products">
         <div className="container mx-auto px-4 md:px-8">
           <div className="shopping-zone rounded-2xl md:rounded-3xl p-6 md:p-8">
-            <ProductGrid subtitle="Premium skincare & beauty essentials crafted for radiant, healthy skin" />
+            <Suspense fallback={<ProductsFallback />}>
+              <ProductGrid subtitle="Premium skincare & beauty essentials crafted for radiant, healthy skin" />
+            </Suspense>
           </div>
         </div>
       </section>
