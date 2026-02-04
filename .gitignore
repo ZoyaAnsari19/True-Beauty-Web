@@ -34,7 +34,7 @@ yarn-error.log*
 .env*
 
 # change log file
-.changelog
+changeLog.md 
 
 # vercel
 .vercel
