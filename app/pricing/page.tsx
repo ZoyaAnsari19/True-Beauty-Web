@@ -120,14 +120,14 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* Plans Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          {/* Plans Grid - 2-col on tablet (768-1024px), 3-col on desktop; Professional full-width on top for tablet */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16 items-stretch">
             {plans.map((plan, index) => (
               <div 
                 key={index} 
-                className={`relative bg-white rounded-2xl border-2 p-8 transition-all duration-300 hover:shadow-xl ${
+                className={`relative flex flex-col bg-white rounded-2xl border-2 p-6 md:p-8 transition-all duration-300 hover:shadow-xl min-w-0 ${
                   plan.popular 
-                    ? 'border-rose-500 shadow-lg scale-105 mt-4 md:mt-0' 
+                    ? 'border-rose-500 shadow-lg md:col-span-2 md:order-first lg:col-span-1 lg:order-none' 
                     : 'border-gray-200 hover:border-rose-300'
                 }`}
               >
@@ -138,28 +138,28 @@ export default function PricingPage() {
                     </span>
                   </div>
                 )}
-                
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">{plan.name}</h3>
-                  <p className="text-gray-600 mb-4">{plan.description}</p>
+
+                <div className="text-center mb-6 md:mb-8 flex-1 flex flex-col">
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">{plan.name}</h3>
+                  <p className="text-gray-600 mb-4 text-sm md:text-base">{plan.description}</p>
                   <div className="flex items-baseline justify-center">
-                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                    <span className="text-gray-500 ml-1">{plan.period}</span>
+                    <span className="text-3xl md:text-4xl font-bold text-gray-900">{plan.price}</span>
+                    <span className="text-gray-500 ml-1 text-base md:text-lg">{plan.period}</span>
                   </div>
                 </div>
 
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-3 mb-6 md:mb-8 min-w-0">
                   {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <Check className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                    <li key={idx} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-700 text-sm md:text-base">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <button
                   onClick={() => handleSelectPlan(plan.name)}
-                  className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
+                  className={`w-full py-3 px-6 rounded-lg font-medium transition-colors shrink-0 ${
                     plan.popular
                       ? 'bg-rose-500 hover:bg-rose-600 text-white'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-800'

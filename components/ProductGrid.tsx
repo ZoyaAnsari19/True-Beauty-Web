@@ -88,7 +88,7 @@ export default function ProductGrid({
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
           {filteredProducts.map((product) => (
             <article
               key={product.id}
@@ -101,7 +101,7 @@ export default function ProductGrid({
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
               </div>
-              <div className="flex flex-col flex-1 p-4 sm:p-5 min-h-0">
+              <div className="flex flex-col flex-1 p-4 sm:p-5 min-h-0 min-w-0 overflow-hidden">
                 <h3 className="font-playfair font-semibold text-gray-800 text-base sm:text-lg leading-tight line-clamp-2">
                   {product.name}
                 </h3>
@@ -115,21 +115,21 @@ export default function ProductGrid({
                     </span>
                   )}
                 </div>
-                <div className="mt-4 flex-1 flex items-end gap-2">
+                <div className="mt-4 flex-1 flex flex-row flex-nowrap items-stretch gap-2 md:gap-3 min-w-0">
                   <button
                     type="button"
                     onClick={() => addToCartAndGo(product)}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-rose-500 text-white py-2.5 px-3 rounded-lg text-xs sm:text-sm font-medium hover:bg-rose-600 transition-colors duration-300"
+                    className="flex-1 min-w-0 md:min-w-[110px] min-h-[44px] md:min-h-[48px] py-2.5 md:py-3 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-rose-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
                   >
-                    <Zap className="w-3.5 h-3.5 flex-shrink-0" />
+                    <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                     Buy Now
                   </button>
                   <Link
                     href={`/product/${product.id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-blue-500 text-white py-2.5 px-3 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors duration-300"
+                    className="flex-1 min-w-0 md:min-w-[110px] min-h-[44px] md:min-h-[48px] py-2.5 md:py-3 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-blue-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-blue-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
                   >
-                    <Eye className="w-3.5 h-3.5 flex-shrink-0" />
-                    View Product
+                    <Eye className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                    View Details
                   </Link>
                 </div>
               </div>
