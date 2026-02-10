@@ -1,25 +1,68 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
+type AppointmentParams = {
+  appointmentId: string;
+  parlourName: string;
+  serviceName: string;
+  location: string;
+  date: string;
+  timeSlot: string;
+  name: string;
+  phone: string;
+  paymentMode: string;
+};
+
 export default function AppointmentConfirmationPage() {
-  const searchParams = useSearchParams();
+  const [params, setParams] = useState<AppointmentParams>({
+    appointmentId: '',
+    parlourName: '',
+    serviceName: '',
+    location: '',
+    date: '',
+    timeSlot: '',
+    name: '',
+    phone: '',
+    paymentMode: '',
+  });
 
-  const appointmentId = searchParams.get('appointmentId') ?? '';
-  const parlourName = searchParams.get('parlourName') ?? '';
-  const serviceName = searchParams.get('serviceName') ?? '';
-  const location = searchParams.get('location') ?? '';
-  const date = searchParams.get('date') ?? '';
-  const timeSlot = searchParams.get('timeSlot') ?? '';
-  const name = searchParams.get('name') ?? '';
-  const phone = searchParams.get('phone') ?? '';
-  const paymentMode = searchParams.get('paymentMode') ?? '';
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-  const hasDetails = Boolean(appointmentId || parlourName || date || timeSlot || name);
+    const searchParams = new URLSearchParams(window.location.search);
+    setParams({
+      appointmentId: searchParams.get('appointmentId') ?? '',
+      parlourName: searchParams.get('parlourName') ?? '',
+      serviceName: searchParams.get('serviceName') ?? '',
+      location: searchParams.get('location') ?? '',
+      date: searchParams.get('date') ?? '',
+      timeSlot: searchParams.get('timeSlot') ?? '',
+      name: searchParams.get('name') ?? '',
+      phone: searchParams.get('phone') ?? '',
+      paymentMode: searchParams.get('paymentMode') ?? '',
+    });
+  }, []);
+
+  const {
+    appointmentId,
+    parlourName,
+    serviceName,
+    location,
+    date,
+    timeSlot,
+    name,
+    phone,
+    paymentMode,
+  } = params;
+
+  const hasDetails = Boolean(
+    appointmentId || parlourName || date || timeSlot || name
+  );
 
   return (
     <div className="min-h-screen gradient-bg">
