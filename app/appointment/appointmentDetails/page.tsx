@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
@@ -17,11 +17,22 @@ type BookingFormState = {
 };
 
 export default function AppointmentDetailsPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const [service, setService] = useState<BeautyService | null>(null);
 
-  const serviceId = searchParams.get('id');
-  const service: BeautyService | undefined = serviceId ? getServiceById(serviceId) : undefined;
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const serviceId = params.get('id');
+    if (!serviceId) {
+      setService(null);
+      return;
+    }
+
+    const found = getServiceById(serviceId);
+    setService(found ?? null);
+  }, []);
 
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingForm, setBookingForm] = useState<BookingFormState>({
