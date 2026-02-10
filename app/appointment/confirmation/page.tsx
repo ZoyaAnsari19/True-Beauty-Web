@@ -2,7 +2,9 @@
 
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 
 export default function AppointmentConfirmationPage() {
   const searchParams = useSearchParams();
@@ -22,8 +24,17 @@ export default function AppointmentConfirmationPage() {
   return (
     <div className="min-h-screen gradient-bg">
       <Header />
-      <main className="pt-24 pb-16 px-4 md:px-8">
+      <main className="mt-5 pt-24 pb-16 px-4 md:px-8">
         <div className="container mx-auto max-w-2xl">
+          <div className="mt-0 mb-4 md:mt-0">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-rose-500 transition-colors text-sm font-medium"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to home
+            </Link>
+          </div>
           <div className="bg-white/95 rounded-2xl border border-rose-100 shadow-sm p-6 md:p-8">
             <h1 className="text-2xl md:text-3xl font-playfair font-bold text-gray-800 mb-2">
               Appointment Confirmed
