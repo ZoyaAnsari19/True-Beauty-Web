@@ -18,6 +18,8 @@ type ProductGridProps = {
   title?: string;
   /** Optional subtitle. */
   subtitle?: string;
+  /** When true, hides the internal title/subtitle header block. */
+  hideHeader?: boolean;
 };
 
 const EMPTY_MESSAGE = 'No products available in this category yet.';
@@ -28,6 +30,7 @@ export default function ProductGrid({
   products: productsProp,
   title: titleProp,
   subtitle,
+  hideHeader,
 }: ProductGridProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,7 +65,7 @@ export default function ProductGrid({
 
   return (
     <div className="w-full">
-      {(title || showSubtitle) && (
+      {!hideHeader && (title || showSubtitle) && (
         <div className="text-center mb-8 md:mb-10">
           {title && (
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-playfair font-bold text-gray-800 mb-2">

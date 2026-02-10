@@ -1,6 +1,8 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -8,8 +10,10 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { Heart, ShoppingBag, User, Instagram, Facebook, Twitter, Youtube, Mail } from 'lucide-react';
+import { Heart, ShoppingBag, User, Instagram, Facebook, Twitter, Youtube, Mail, MapPin, Eye } from 'lucide-react';
 import ProductGrid from '../components/ProductGrid';
+import { categories, getCategoryNameBySlug } from '../utils/categories';
+import { BeautyService, getServicesByCategory } from '../utils/services';
 
 const heroSlides = [
   { id: 1, title: "True Beauty Skincare Collection", tagline: "Premium formulations for radiant, glowing skin. Hydrating mist, serum, foundation & more.", benefits: ["Luxury ingredients & elegant packaging", "Suitable for all skin types", "Minimalist, cruelty-free beauty"], buttonText: "Shop Now", image: "/images/heroSection/allProducts.png", bgColor: "from-rose-50 to-pink-50" },
@@ -35,47 +39,275 @@ function ProductsFallback() {
 }
 
 export default function Home() {
+  const router = useRouter();
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<BeautyService | null>(null);
+  const [bookingForm, setBookingForm] = useState({
+    name: '',
+    phone: '',
+    date: '',
+    timeSlot: '',
+    paymentMode: 'pay-at-parlour' as 'pay-at-parlour' | 'online',
+  });
+
+  const servicesForCategory = useMemo(
+    () => getServicesByCategory(selectedCategory),
+    [selectedCategory]
+  );
+
+  const selectedCategoryLabel =
+    selectedCategory === 'all' ? 'All Categories' : getCategoryNameBySlug(selectedCategory);
+
+  const handleCategoryClick = (slug: string) => {
+    setSelectedCategory(slug);
+  };
+
+  const handleOpenBooking = (service: BeautyService) => {
+    setSelectedService(service);
+    setBookingOpen(true);
+  };
+
+  const handleCloseBooking = () => {
+    setBookingOpen(false);
+  };
+
+  const handleBookingInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setBookingForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleConfirmBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedService) return;
+
+    const { name, phone, date, timeSlot, paymentMode } = bookingForm;
+    if (!name || !phone || !date || !timeSlot) {
+      return;
+    }
+
+    const appointmentId = `TB-${Date.now().toString().slice(-6)}`;
+    const searchParams = new URLSearchParams({
+      appointmentId,
+      parlourName: selectedService.parlourName,
+      serviceName: selectedService.serviceName,
+      location: selectedService.location,
+      date,
+      timeSlot,
+      name,
+      phone,
+      paymentMode: paymentMode === 'pay-at-parlour' ? 'Pay at Parlour' : 'Online Payment',
+    });
+
+    setBookingOpen(false);
+    router.push(`/appointment/confirmation?${searchParams.toString()}`);
+  };
+
   return (
     <div className="min-h-screen gradient-bg">
       <Header />
       <main className="pt-24 pb-0 md:pt-32">
-      <section className="pb-16 md:pb-24 border-b border-rose-200/60">
-        <div className="container mx-auto px-4 md:px-8">
-          <Swiper modules={[Autoplay, Pagination, Navigation]} autoplay={{ delay: 5000, disableOnInteraction: false }} pagination={{ clickable: true }} navigation={true} loop={true} className="rounded-3xl overflow-hidden pastel-shadow border border-rose-200/60">
-            {heroSlides.map((slide) => (
-              <SwiperSlide key={slide.id}>
-                <div className={`min-h-[500px] md:min-h-[600px] bg-gradient-to-r ${slide.bgColor} flex flex-col md:flex-row`}>
-                  <div className="flex-1 flex items-center p-8 md:p-16 animate-slide-in-left">
-                    <div className="max-w-lg">
-                      <h1 className="text-4xl md:text-5xl font-playfair font-bold text-gray-800 mb-4 leading-tight">{slide.title}</h1>
-                      <p className="text-gray-600 text-lg mb-6 leading-relaxed">{slide.tagline}</p>
-                      <ul className="space-y-2 mb-8">
-                        {slide.benefits.map((benefit, idx) => (
-                          <li key={idx} className="flex items-center gap-2 text-gray-600"><span className="w-2 h-2 bg-pink-400 rounded-full flex-shrink-0" />{benefit}</li>
-                        ))}
-                      </ul>
-                      <button className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300">{slide.buttonText}</button>
+        <section className="pb-16 md:pb-24 border-b border-rose-200/60">
+          <div className="container mx-auto px-4 md:px-8">
+            <Swiper
+              modules={[Autoplay, Pagination, Navigation]}
+              autoplay={{ delay: 5000, disableOnInteraction: false }}
+              pagination={{ clickable: true }}
+              navigation={true}
+              loop={true}
+              className="rounded-3xl overflow-hidden pastel-shadow border border-rose-200/60"
+            >
+              {heroSlides.map((slide) => (
+                <SwiperSlide key={slide.id}>
+                  <div
+                    className={`min-h[500px] md:min-h-[600px] bg-gradient-to-r ${slide.bgColor} flex flex-col md:flex-row`}
+                  >
+                    <div className="flex-1 flex items-center p-8 md:p-16 animate-slide-in-left">
+                      <div className="max-w-lg">
+                        <h1 className="text-4xl md:text-5xl font-playfair font-bold text-gray-800 mb-4 leading-tight">
+                          {slide.title}
+                        </h1>
+                        <p className="text-gray-600 text-lg mb-6 leading-relaxed">{slide.tagline}</p>
+                        <ul className="space-y-2 mb-8">
+                          {slide.benefits.map((benefit, idx) => (
+                            <li key={idx} className="flex items-center gap-2 text-gray-600">
+                              <span className="w-2 h-2 bg-pink-400 rounded-full flex-shrink-0" />
+                              {benefit}
+                            </li>
+                          ))}
+                        </ul>
+                        <button className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300">
+                          {slide.buttonText}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex-1 flex items-center justify-center p-8 animate-slide-in-right">
+                      <img
+                        src={slide.image}
+                        alt={slide.title}
+                        className="max-h-80 md:max-h-96 w-auto object-contain drop-shadow-lg"
+                      />
                     </div>
                   </div>
-                  <div className="flex-1 flex items-center justify-center p-8 animate-slide-in-right">
-                    <img src={slide.image} alt={slide.title} className="max-h-80 md:max-h-96 w-auto object-contain drop-shadow-lg" />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        </section>
+
+        <section
+          id="products"
+          className="py-16 md:py-24 border-b border-rose-200/60"
+          aria-label="Products and services"
+        >
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="shopping-zone rounded-2xl md:rounded-3xl p-6 md:p-8">
+              <div className="flex flex-col gap-6 md:gap-8">
+                <div className="text-center">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-playfair font-bold text-gray-800">
+                    Our Products &amp; Services
+                  </h2>
+                  <p className="mt-2 text-gray-600 text-sm md:text-base max-w-2xl mx-auto">
+                    Explore curated True Beauty products and trusted beauty parlour services for every
+                    occasion.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs md:text-sm text-gray-500">
+                      Viewing: <span className="font-medium text-gray-700">{selectedCategoryLabel}</span>
+                    </p>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto md:flex-wrap md:justify-center md:overflow-visible pb-1">
+                    <button
+                      type="button"
+                      onClick={() => handleCategoryClick('all')}
+                      className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
+                        selectedCategory === 'all'
+                          ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
+                          : 'bg-white/80 text-gray-700 border-rose-100 hover:bg-rose-50'
+                      }`}
+                    >
+                      All
+                    </button>
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        type="button"
+                        onClick={() => handleCategoryClick(category.slug)}
+                        className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
+                          selectedCategory === category.slug
+                            ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
+                            : 'bg-white/80 text-gray-700 border-rose-100 hover:bg-rose-50'
+                        }`}
+                      >
+                        {category.name}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </section>
 
-      <section id="products" className="py-16 md:py-24 border-b border-rose-200/60" aria-label="Products">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="shopping-zone rounded-2xl md:rounded-3xl p-6 md:p-8">
-            <Suspense fallback={<ProductsFallback />}>
-              <ProductGrid subtitle="Premium skincare & beauty essentials crafted for radiant, healthy skin" />
-            </Suspense>
+                <div>
+                  <Suspense fallback={<ProductsFallback />}>
+                    <ProductGrid
+                      categorySlug={selectedCategory === 'all' ? undefined : selectedCategory}
+                      hideHeader
+                      subtitle="Premium beauty picks, tailored to your chosen category."
+                    />
+                  </Suspense>
+                </div>
+
+                <div className="pt-6 md:pt-8 border-t border-rose-100/70">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 md:mb-6">
+                    <div>
+                      <h3 className="text-xl md:text-2xl font-playfair font-semibold text-gray-800">
+                        Services
+                      </h3>
+                      <p className="text-gray-600 text-sm md:text-base">
+                        Beauty parlour appointments handpicked for{' '}
+                        <span className="font-medium">{selectedCategoryLabel.toLowerCase()}</span>.
+                      </p>
+                    </div>
+                  </div>
+
+                  {servicesForCategory.length === 0 ? (
+                    <div className="text-center py-10 px-4 rounded-2xl bg-white/60 border border-dashed border-rose-200/80">
+                      <p className="text-gray-600 text-sm md:text-base mb-2">
+                        No beauty parlour services available for this category yet.
+                      </p>
+                      <p className="text-gray-400 text-xs md:text-sm">
+                        Try switching to another category to discover more services.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+                      {servicesForCategory.map((service) => (
+                        <article
+                          key={service.id}
+                          className="group bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden border border-rose-100/80 flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:shadow-rose-100/40 hover:border-rose-200/80"
+                        >
+                          <div className="relative h-40 sm:h-48 overflow-hidden bg-rose-50/60">
+                            <img
+                              src={service.image}
+                              alt={service.serviceName}
+                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                            />
+                          </div>
+                          <div className="flex flex-col flex-1 p-4 sm:p-5">
+                            <div className="mb-2">
+                              <p className="text-xs uppercase tracking-wide text-rose-500 font-semibold">
+                                Beauty Parlour Service
+                              </p>
+                              <h3 className="font-playfair font-semibold text-gray-800 text-base sm:text-lg leading-tight line-clamp-2">
+                                {service.parlourName}
+                              </h3>
+                            </div>
+                            <p className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 mb-2">
+                              <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-rose-400" />
+                              <span className="line-clamp-1">{service.location}</span>
+                            </p>
+                            <p className="text-sm text-gray-700 font-medium mb-2 line-clamp-2">
+                              {service.serviceName}
+                            </p>
+                            <div className="mt-auto flex flex-col gap-3">
+                              <div>
+                                <span className="block text-xs text-gray-500 uppercase tracking-wide">
+                                  Starting from
+                                </span>
+                                <span className="text-lg font-bold text-gray-900">
+                                  ₹{service.startingPrice.toLocaleString('en-IN')}
+                                </span>
+                              </div>
+                              <div className="flex flex-row flex-nowrap items-stretch gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenBooking(service)}
+                                  className="flex-1 inline-flex items-center justify-center px-3 sm:px-4 py-2 rounded-lg bg-rose-500 text-white text-xs sm:text-sm font-medium hover:bg-rose-600 transition-colors duration-200 whitespace-nowrap"
+                                >
+                                  Book Appointment
+                                </button>
+                                <Link
+                                  href={`/appointment/appointmentDetails?id=${service.id}`}
+                                  className="flex-1 inline-flex items-center justify-center px-3 sm:px-4 py-2 rounded-lg bg-blue-500 text-white text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors duration-200 whitespace-nowrap"
+                                >
+                                  <Eye className="w-3.5 h-3.5 flex-shrink-0 mr-1.5" />
+                                  View Details
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       <section className="py-16 md:py-20 border-y border-rose-200/60">
         <div className="container mx-auto px-4 md:px-8">
@@ -124,6 +356,131 @@ export default function Home() {
       </section>
 
       </main>
+
+      {bookingOpen && selectedService && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 md:p-7 relative">
+            <button
+              type="button"
+              onClick={handleCloseBooking}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+              aria-label="Close booking"
+            >
+              ×
+            </button>
+            <div className="mb-4">
+              <h2 className="text-xl md:text-2xl font-playfair font-semibold text-gray-800">
+                Book Appointment
+              </h2>
+              <p className="mt-1 text-sm text-gray-600">
+                {selectedService.parlourName} · {selectedService.serviceName}
+              </p>
+            </div>
+            <form className="space-y-4" onSubmit={handleConfirmBooking}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">
+                  Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={bookingForm.name}
+                  onChange={handleBookingInputChange}
+                  className="w-full rounded-lg border border-rose-100 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400/70 focus:border-rose-300 bg-white"
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="phone">
+                  Phone number
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  required
+                  value={bookingForm.phone}
+                  onChange={handleBookingInputChange}
+                  className="w-full rounded-lg border border-rose-100 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400/70 focus:border-rose-300 bg-white"
+                  placeholder="e.g. +91 98765 43210"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="date">
+                    Preferred date
+                  </label>
+                  <input
+                    id="date"
+                    name="date"
+                    type="date"
+                    required
+                    value={bookingForm.date}
+                    onChange={handleBookingInputChange}
+                    className="w-full rounded-lg border border-rose-100 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400/70 focus:border-rose-300 bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="timeSlot">
+                    Preferred time slot
+                  </label>
+                  <select
+                    id="timeSlot"
+                    name="timeSlot"
+                    required
+                    value={bookingForm.timeSlot}
+                    onChange={handleBookingInputChange}
+                    className="w-full rounded-lg border border-rose-100 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400/70 focus:border-rose-300 bg-white"
+                  >
+                    <option value="">Select a time slot</option>
+                    <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
+                    <option value="12:00 PM - 2:00 PM">12:00 PM - 2:00 PM</option>
+                    <option value="3:00 PM - 5:00 PM">3:00 PM - 5:00 PM</option>
+                    <option value="5:00 PM - 7:00 PM">5:00 PM - 7:00 PM</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Payment option
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label className="flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm cursor-pointer transition-colors duration-200 bg-white border-rose-100 data-[checked=true]:border-rose-500 data-[checked=true]:bg-rose-50">
+                    <input
+                      type="radio"
+                      name="paymentMode"
+                      value="pay-at-parlour"
+                      checked={bookingForm.paymentMode === 'pay-at-parlour'}
+                      onChange={handleBookingInputChange}
+                      className="h-4 w-4 text-rose-500 border-rose-300 focus:ring-rose-400"
+                    />
+                    <span>Pay at Parlour</span>
+                  </label>
+                  <label className="flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm cursor-pointer transition-colors duration-200 bg-white border-rose-100 data-[checked=true]:border-rose-500 data-[checked=true]:bg-rose-50">
+                    <input
+                      type="radio"
+                      name="paymentMode"
+                      value="online"
+                      checked={bookingForm.paymentMode === 'online'}
+                      onChange={handleBookingInputChange}
+                      className="h-4 w-4 text-rose-500 border-rose-300 focus:ring-rose-400"
+                    />
+                    <span>Online Payment</span>
+                  </label>
+                </div>
+              </div>
+              <button
+                type="submit"
+                className="w-full inline-flex items-center justify-center rounded-lg bg-rose-500 text-white font-medium text-sm md:text-base py-2.5 md:py-3 hover:bg-rose-600 transition-colors duration-200"
+              >
+                Confirm Booking
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Social media – footer ke upar */}
       <section className="py-8 md:py-10 bg-gradient-to-b from-white/60 to-rose-50/40 border-t border-rose-200/60">
