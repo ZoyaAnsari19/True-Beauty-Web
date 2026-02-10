@@ -281,17 +281,17 @@ export default function Home() {
                                   ₹{service.startingPrice.toLocaleString('en-IN')}
                                 </span>
                               </div>
-                              <div className="flex flex-row flex-nowrap items-stretch gap-2">
+                              <div className="flex flex-row flex-nowrap items-stretch gap-2 md:gap-3 min-w-0">
                                 <button
                                   type="button"
                                   onClick={() => handleOpenBooking(service)}
-                                  className="flex-1 inline-flex items-center justify-center px-3 sm:px-4 py-2 rounded-lg bg-rose-500 text-white text-xs sm:text-sm font-medium hover:bg-rose-600 transition-colors duration-200 whitespace-nowrap"
+                                  className="flex-1 min-w-0 md:min-w-[110px] min-h-[40px] md:min-h-[44px] px-3 sm:px-4 py-2 inline-flex items-center justify-center rounded-lg bg-rose-500 text-white text-xs sm:text-sm font-medium hover:bg-rose-600 transition-colors duration-200 shrink-0 whitespace-nowrap"
                                 >
                                   Book Appointment
                                 </button>
                                 <Link
                                   href={`/appointment/appointmentDetails?id=${service.id}`}
-                                  className="flex-1 inline-flex items-center justify-center px-3 sm:px-4 py-2 rounded-lg bg-blue-500 text-white text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors duration-200 whitespace-nowrap"
+                                  className="flex-1 min-w-0 md:min-w-[110px] min-h-[40px] md:min-h-[44px] px-3 sm:px-4 py-2 inline-flex items-center justify-center rounded-lg bg-blue-500 text-white text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors duration-200 shrink-0 whitespace-nowrap"
                                 >
                                   <Eye className="w-3.5 h-3.5 flex-shrink-0 mr-1.5" />
                                   View Details
