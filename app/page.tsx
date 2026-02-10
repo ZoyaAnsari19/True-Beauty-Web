@@ -253,7 +253,7 @@ export default function Home() {
                             <img
                               src={service.image}
                               alt={service.serviceName}
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out"
                             />
                           </div>
                           <div className="flex flex-col flex-1 p-4 sm:p-5">

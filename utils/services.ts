@@ -28,7 +28,7 @@ export const beautyServices: BeautyService[] = [
     phone: '+91 98765 12345',
     workingHours: '10:00 AM – 8:00 PM (Mon–Sun)',
     serviceName: 'Hydra Glow Facial',
-    image: '/images/services/hydra-glow-facial.jpg',
+    image: '/services/hydraFacial.png',
     startingPrice: 1499,
     servicesOffered: ['Hydra Facials', 'Skin Polishing', 'Detan Treatments', 'Bridal Facials'],
   },
@@ -41,7 +41,7 @@ export const beautyServices: BeautyService[] = [
     phone: '+91 91234 56789',
     workingHours: '11:00 AM – 9:00 PM (Tue–Sun)',
     serviceName: 'Bridal Radiance Package',
-    image: '/images/services/bridal-radiance.jpg',
+    image: '/services/bridalMakeup.png',
     startingPrice: 3499,
     servicesOffered: ['Bridal Facials', 'Pre-bridal Packages', 'Body Polishing', 'Makeup Trials'],
   },
@@ -54,7 +54,7 @@ export const beautyServices: BeautyService[] = [
     phone: '+91 99888 77665',
     workingHours: '9:30 AM – 8:30 PM (Mon–Sat)',
     serviceName: 'Party Makeup & Styling',
-    image: '/images/services/party-makeup.jpg',
+    image: '/services/partyMakeup.png',
     startingPrice: 1999,
     servicesOffered: ['Party Makeup', 'Cocktail Makeup', 'Bridal Makeup', 'Hair Styling'],
   },
@@ -67,7 +67,7 @@ export const beautyServices: BeautyService[] = [
     phone: '+91 90123 45678',
     workingHours: '10:00 AM – 9:00 PM (Mon–Sun)',
     serviceName: 'Keratin Smoothening Treatment',
-    image: '/images/services/keratin-treatment.jpg',
+    image: '/services/hairTreatment.png',
     startingPrice: 2999,
     servicesOffered: ['Keratin Treatment', 'Smoothening', 'Hair Spa', 'Haircut & Styling'],
   },
@@ -80,7 +80,7 @@ export const beautyServices: BeautyService[] = [
     phone: '+91 93030 11223',
     workingHours: '11:00 AM – 10:00 PM (All days)',
     serviceName: 'Aromatherapy Spa Ritual',
-    image: '/images/services/aroma-spa.jpg',
+    image: '/services/spa.png',
     startingPrice: 2499,
     servicesOffered: ['Aromatherapy Massage', 'Body Spa', 'Head Massage', 'Detox Rituals'],
   },
@@ -98,5 +98,3 @@ export function getServiceById(id: number | string): BeautyService | undefined {
   if (Number.isNaN(numericId)) return undefined;
   return beautyServices.find((service) => service.id === numericId);
 }
-
-

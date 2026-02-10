@@ -101,7 +101,7 @@ export default function ProductGrid({
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
               <div className="flex flex-col flex-1 p-4 sm:p-5 min-h-0 min-w-0 overflow-hidden">
