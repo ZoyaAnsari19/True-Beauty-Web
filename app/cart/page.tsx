@@ -106,12 +106,10 @@ export default function CartPage() {
       let message = result.message;
       if (result.errorCode === 'EXPIRED') {
         message = 'This coupon has expired.';
-      } else if (result.errorCode === 'MIN_AMOUNT') {
-        message = `Minimum cart amount of ₹2000 on eligible premium categories is required to use this coupon.`;
       } else if (result.errorCode === 'USER_LIMIT') {
         message = result.message || 'You have already used this coupon.';
       } else if (result.errorCode === 'NO_ELIGIBLE_ITEMS') {
-        message = 'Coupon is only applicable on selected premium categories and excludes already discounted products.';
+        message = 'Coupon is only applicable on selected premium categories.';
       }
 
       setCouponMessage(message);
@@ -263,8 +261,8 @@ export default function CartPage() {
                     </p>
                   )}
                   <p className="mt-1 text-[11px] text-gray-500">
-                    Coupon is valid only on selected premium categories, excludes already discounted products, and cannot
-                    be combined with other offers.
+                    Coupon is valid only on selected premium categories and cannot be combined with other offers. Minimum
+                    eligible cart value of ₹1000 is required.
                   </p>
                 </div>
 

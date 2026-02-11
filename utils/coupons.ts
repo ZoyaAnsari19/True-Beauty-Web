@@ -35,7 +35,7 @@ const USAGE_STORAGE_KEY = 'tb_coupon_usage';
 // Reusable display/config values for the default coupon used across the app
 export const DEFAULT_COUPON_CODE = 'TRUEPREMIUM200';
 export const DEFAULT_COUPON_DISCOUNT = 200;
-export const DEFAULT_COUPON_MIN_CART_TOTAL = 2000;
+export const DEFAULT_COUPON_MIN_CART_TOTAL = 1000;
 // Minimum single-product price at which we want to *show*
 // coupon messaging on product cards / detail pages.
 // (Actual applicability at checkout is still based on
@@ -45,18 +45,18 @@ export const DEFAULT_COUPON_PRODUCT_MIN_PRICE = 1000;
 // Default "premium" categories for the sample coupon (can be adjusted in admin)
 export const DEFAULT_PREMIUM_CATEGORIES = ['skincare', 'makeup', 'haircare', 'fragrance', 'jewellery', 'gifting'];
 
-// Seed example coupon that follows your spec: flat ₹200 off, min ₹2000
+// Seed example coupon that follows your spec: flat ₹200 off, min ₹1000
 export const DEFAULT_COUPONS: Coupon[] = [
   {
     code: DEFAULT_COUPON_CODE,
-    description: '₹200 OFF on premium categories for orders above ₹2000',
+    description: '₹200 OFF on premium categories for orders above ₹1000',
     discountAmount: DEFAULT_COUPON_DISCOUNT,
     minCartTotal: DEFAULT_COUPON_MIN_CART_TOTAL,
     startDate: new Date().toISOString().slice(0, 10),
     // 30 days validity by default
     expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
     applicableCategories: DEFAULT_PREMIUM_CATEGORIES,
-    excludeDiscountedProducts: true,
+    excludeDiscountedProducts: false,
     usageLimit: 0,
     perUserLimit: 1,
     combinable: false,

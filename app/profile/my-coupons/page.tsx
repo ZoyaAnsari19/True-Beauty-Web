@@ -18,7 +18,7 @@ export default function MyCouponsPage() {
           {/* Back link */}
           <div className="md:hidden mb-4">
             <Link
-              href="/profile"
+              href="/"
               className="inline-flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -26,12 +26,12 @@ export default function MyCouponsPage() {
           </div>
           <div className="hidden lg:block mb-4">
             <Link
-              href="/profile"
+              href="/"
               className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">
-                Back to profile
+                Back to home
               </span>
             </Link>
           </div>
