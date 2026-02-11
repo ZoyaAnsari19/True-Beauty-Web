@@ -32,20 +32,17 @@ function ServicesContent() {
   return (
     <div className="min-h-screen gradient-bg">
       <Header />
-      <main className="pt-24 pb-16 md:pt-32 md:pb-24">
-        <section className="py-8 md:py-12 border-b border-rose-200/60">
+      <main className="pt-24 pb-16 md:pt-28 md:pb-24">
+        <section className="py-10md:py-14">
           <div className="container mx-auto px-4 md:px-8">
-            <Link
-              href="/"
-              className="text-sm text-rose-600 hover:text-rose-700 font-medium transition-colors"
-            >
-              ← Back to Home
-            </Link>
-          </div>
-        </section>
-
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4 md:px-8">
+            <div className="mb-4">
+              <Link
+                href="/"
+                className="text-sm text-rose-600 hover:text-rose-700 font-medium transition-colors"
+              >
+                ← Back to Home
+              </Link>
+            </div>
             <div className="shopping-zone rounded-2xl md:rounded-3xl p-6 md:p-8">
               <div className="text-center mb-8 md:mb-10">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-playfair font-bold text-gray-800 mb-2">
