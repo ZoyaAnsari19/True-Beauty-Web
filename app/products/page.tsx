@@ -1,0 +1,70 @@
+'use client';
+
+import { useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import ProductGrid from '../../components/ProductGrid';
+import Pagination from '../../components/Pagination';
+import { products } from '../../utils/catalog';
+
+const PER_PAGE = 12;
+
+export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1);
+
+  const { paginatedProducts, totalPages } = useMemo(() => {
+    const total = products.length;
+    const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+    const safePage = Math.min(page, totalPages);
+    const start = (safePage - 1) * PER_PAGE;
+    const paginatedProducts = products.slice(start, start + PER_PAGE);
+    return { paginatedProducts, totalPages: totalPages, currentPage: safePage };
+  }, [page]);
+
+  const currentPage = Math.min(page, totalPages);
+
+  return (
+    <div className="min-h-screen gradient-bg">
+      <Header />
+      <main className="pt-24 pb-16 md:pt-32 md:pb-24">
+        <section className="py-8 md:py-12 border-b border-rose-200/60">
+          <div className="container mx-auto px-4 md:px-8">
+            <Link
+              href="/"
+              className="text-sm text-rose-600 hover:text-rose-700 font-medium transition-colors"
+            >
+              ← Back to Home
+            </Link>
+          </div>
+        </section>
+
+        <section className="py-12 md:py-16">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="shopping-zone rounded-2xl md:rounded-3xl p-6 md:p-8">
+              <div className="text-center mb-8 md:mb-10">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-playfair font-bold text-gray-800 mb-2">
+                  All Products
+                </h1>
+                <p className="text-gray-600 text-sm md:text-base max-w-xl mx-auto">
+                  Browse our full collection of True Beauty products.
+                </p>
+              </div>
+
+              <ProductGrid products={paginatedProducts} hideHeader />
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                basePath="/products"
+              />
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}

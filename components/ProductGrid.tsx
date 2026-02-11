@@ -3,10 +3,10 @@
 import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Zap, Eye } from 'lucide-react';
-import { products, getProductsByCategory } from '../utils/products';
+import { products, getProductsByCategory } from '../utils/catalog';
 import { getCategoryNameBySlug } from '../utils/categories';
-import type { Product } from '../utils/products';
+import type { Product } from '../utils/catalog';
+import Card from './ui/Card';
 
 type ProductGridProps = {
   /** When provided, filter by category (and optional subcategory). When omitted, show all products or use `products` prop. */
@@ -20,6 +20,12 @@ type ProductGridProps = {
   subtitle?: string;
   /** When true, hides the internal title/subtitle header block. */
   hideHeader?: boolean;
+  /** Max items to show (e.g. 8 for homepage). When set, list is sliced. */
+  limit?: number;
+  /** When true and limit is set, show "View All Products" link below the grid. */
+  showViewAll?: boolean;
+  /** Desktop grid columns (lg breakpoint). Use 4 for homepage 2-row layout. */
+  columnsLg?: 3 | 4;
 };
 
 const EMPTY_MESSAGE = 'No products available in this category yet.';
@@ -31,6 +37,9 @@ export default function ProductGrid({
   title: titleProp,
   subtitle,
   hideHeader,
+  limit,
+  showViewAll = false,
+  columnsLg = 3,
 }: ProductGridProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,10 +57,12 @@ export default function ProductGrid({
   };
 
   const filteredProducts = useMemo(() => {
-    if (productsProp) return productsProp;
-    if (categoryFromUrl) return getProductsByCategory(categoryFromUrl, subcategoryFromUrl || undefined);
-    return products;
-  }, [productsProp, categoryFromUrl, subcategoryFromUrl]);
+    let list: Product[];
+    if (productsProp) list = productsProp;
+    else if (categoryFromUrl) list = getProductsByCategory(categoryFromUrl, subcategoryFromUrl || undefined);
+    else list = products;
+    return limit != null && limit > 0 ? list.slice(0, limit) : list;
+  }, [productsProp, categoryFromUrl, subcategoryFromUrl, limit]);
 
   useEffect(() => {
     if (!categoryFromUrl || typeof document === 'undefined') return;
@@ -91,54 +102,28 @@ export default function ProductGrid({
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-          {filteredProducts.map((product) => (
-            <article
-              key={product.id}
-              className="group bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden border border-rose-100/80 flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:shadow-rose-100/40 hover:border-rose-200/80"
-            >
-              <div className="relative aspect-square sm:aspect-[4/3] overflow-hidden bg-rose-50/60">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex flex-col flex-1 p-4 sm:p-5 min-h-0 min-w-0 overflow-hidden">
-                <h3 className="font-playfair font-semibold text-gray-800 text-base sm:text-lg leading-tight line-clamp-2">
-                  {product.name}
-                </h3>
-                <div className="flex items-baseline gap-2 mt-2">
-                  <span className="text-lg font-bold text-gray-900">
-                    ₹{product.price.toLocaleString('en-IN')}
-                  </span>
-                  {product.originalPrice > product.price && (
-                    <span className="text-sm text-gray-400 line-through">
-                      ₹{product.originalPrice.toLocaleString('en-IN')}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-4 flex-1 flex flex-row flex-nowrap items-stretch gap-2 md:gap-3 min-w-0">
-                  <button
-                    type="button"
-                    onClick={() => addToCartAndGo(product)}
-                    className="flex-1 min-w-0 md:min-w-[110px] min-h-[44px] md:min-h-[48px] py-2.5 md:py-3 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-rose-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
-                  >
-                    <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
-                    Buy Now
-                  </button>
-                  <Link
-                    href={`/product/${product.id}`}
-                    className="flex-1 min-w-0 md:min-w-[110px] min-h-[44px] md:min-h-[48px] py-2.5 md:py-3 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-blue-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-blue-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
-                  >
-                    <Eye className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
-                    View Details
-                  </Link>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+        <>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 ${columnsLg === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+            {filteredProducts.map((product) => (
+              <Card
+                key={product.id}
+                variant="product"
+                item={product}
+                onBuyNow={addToCartAndGo}
+              />
+            ))}
+          </div>
+          {showViewAll && limit != null && limit > 0 && (
+            <div className="mt-6 md:mt-8 flex justify-center">
+              <Link
+                href="/products"
+                className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
+              >
+                View All Products
+              </Link>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

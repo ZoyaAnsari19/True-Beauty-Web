@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import { MapPin, Phone, Clock, ArrowLeft, CheckCircle } from 'lucide-react';
-import { getServiceById, type BeautyService } from '../../../utils/services';
+import { getServiceById, type BeautyService } from '../../../utils/catalog';
 
 type BookingFormState = {
   name: string;

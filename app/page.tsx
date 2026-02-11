@@ -10,10 +10,11 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { Heart, ShoppingBag, User, Instagram, Facebook, Twitter, Youtube, Mail, MapPin, Eye } from 'lucide-react';
+import { Heart, ShoppingBag, User, Instagram, Facebook, Twitter, Youtube, Mail } from 'lucide-react';
 import ProductGrid from '../components/ProductGrid';
 import { categories, getCategoryNameBySlug } from '../utils/categories';
-import { BeautyService, getServicesByCategory } from '../utils/services';
+import { BeautyService, getServicesByCategory } from '../utils/catalog';
+import Card from '../components/ui/Card';
 
 const heroSlides = [
   { id: 1, title: "True Beauty Skincare Collection", tagline: "Premium formulations for radiant, glowing skin. Hydrating mist, serum, foundation & more.", benefits: ["Luxury ingredients & elegant packaging", "Suitable for all skin types", "Minimalist, cruelty-free beauty"], buttonText: "Shop Now", image: "/images/heroSection/allProducts.png", bgColor: "from-rose-50 to-pink-50" },
@@ -52,7 +53,7 @@ export default function Home() {
   });
 
   const servicesForCategory = useMemo(
-    () => getServicesByCategory(selectedCategory),
+    () => getServicesByCategory(selectedCategory).slice(0, 8),
     [selectedCategory]
   );
 
@@ -216,6 +217,9 @@ export default function Home() {
                       categorySlug={selectedCategory === 'all' ? undefined : selectedCategory}
                       hideHeader
                       subtitle="Premium beauty picks, tailored to your chosen category."
+                      limit={8}
+                      showViewAll
+                      columnsLg={4}
                     />
                   </Suspense>
                 </div>
@@ -243,65 +247,26 @@ export default function Home() {
                       </p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-                      {servicesForCategory.map((service) => (
-                        <article
-                          key={service.id}
-                          className="group bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden border border-rose-100/80 flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:shadow-rose-100/40 hover:border-rose-200/80"
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                        {servicesForCategory.map((service) => (
+                          <Card
+                            key={service.id}
+                            variant="service"
+                            item={service}
+                            onBook={() => handleOpenBooking(service)}
+                          />
+                        ))}
+                      </div>
+                      <div className="mt-6 md:mt-8 flex justify-center">
+                        <Link
+                          href="/services"
+                          className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
                         >
-                          <div className="relative h-40 sm:h-48 overflow-hidden bg-rose-50/60">
-                            <img
-                              src={service.image}
-                              alt={service.serviceName}
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out"
-                            />
-                          </div>
-                          <div className="flex flex-col flex-1 p-4 sm:p-5">
-                            <div className="mb-2">
-                              <p className="text-xs uppercase tracking-wide text-rose-500 font-semibold">
-                                Beauty Parlour Service
-                              </p>
-                              <h3 className="font-playfair font-semibold text-gray-800 text-base sm:text-lg leading-tight line-clamp-2">
-                                {service.parlourName}
-                              </h3>
-                            </div>
-                            <p className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 mb-2">
-                              <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-rose-400" />
-                              <span className="line-clamp-1">{service.location}</span>
-                            </p>
-                            <p className="text-sm text-gray-700 font-medium mb-2 line-clamp-2">
-                              {service.serviceName}
-                            </p>
-                            <div className="mt-auto flex flex-col gap-3">
-                              <div>
-                                <span className="block text-xs text-gray-500 uppercase tracking-wide">
-                                  Starting from
-                                </span>
-                                <span className="text-lg font-bold text-gray-900">
-                                  ₹{service.startingPrice.toLocaleString('en-IN')}
-                                </span>
-                              </div>
-                              <div className="flex flex-row flex-nowrap items-stretch gap-2 md:gap-3 min-w-0">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenBooking(service)}
-                                  className="flex-1 min-w-0 md:min-w-[110px] min-h-[40px] md:min-h-[44px] px-3 sm:px-4 py-2 inline-flex items-center justify-center rounded-lg bg-rose-500 text-white text-xs sm:text-sm font-medium hover:bg-rose-600 transition-colors duration-200 shrink-0 whitespace-nowrap"
-                                >
-                                  Book Appointment
-                                </button>
-                                <Link
-                                  href={`/appointment/appointmentDetails?id=${service.id}`}
-                                  className="flex-1 min-w-0 md:min-w-[110px] min-h-[40px] md:min-h-[44px] px-3 sm:px-4 py-2 inline-flex items-center justify-center rounded-lg bg-blue-500 text-white text-xs sm:text-sm font-medium hover:bg-blue-600 transition-colors duration-200 shrink-0 whitespace-nowrap"
-                                >
-                                  <Eye className="w-3.5 h-3.5 flex-shrink-0 mr-1.5" />
-                                  View Details
-                                </Link>
-                              </div>
-                            </div>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
+                          View All Services
+                        </Link>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>

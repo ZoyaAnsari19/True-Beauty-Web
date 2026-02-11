@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
-import { getProductById } from '../../../utils/products';
+import { getProductById } from '../../../utils/catalog';
 import { ArrowLeft, ShoppingBag, Star, Zap } from 'lucide-react';
 
 export default function ProductPage() {
