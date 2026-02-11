@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '../../components/Header';
@@ -11,21 +11,19 @@ import { beautyServices } from '../../utils/catalog';
 
 const PER_PAGE = 12;
 
-export default function ServicesPage() {
+function ServicesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1);
 
-  const { paginatedServices, totalPages } = useMemo(() => {
-    const total = beautyServices.length;
-    const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
-    const safePage = Math.min(page, totalPages);
-    const start = (safePage - 1) * PER_PAGE;
-    const paginatedServices = beautyServices.slice(start, start + PER_PAGE);
-    return { paginatedServices, totalPages };
-  }, [page]);
+  const rawPage = searchParams.get('page');
+  const parsedPage = rawPage ? parseInt(rawPage, 10) : 1;
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
+  const total = beautyServices?.length ?? 0;
+  const totalPages = total > 0 ? Math.max(1, Math.ceil(total / PER_PAGE)) : 1;
   const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * PER_PAGE;
+  const paginatedServices = total > 0 ? beautyServices.slice(start, start + PER_PAGE) : [];
 
   const handleBook = (id: number) => {
     router.push(`/appointment/appointmentDetails?id=${id}`);
@@ -80,5 +78,13 @@ export default function ServicesPage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function ServicesPage() {
+  return (
+    <Suspense fallback={null}>
+      <ServicesContent />
+    </Suspense>
   );
 }
