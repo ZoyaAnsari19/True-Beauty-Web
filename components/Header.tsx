@@ -136,8 +136,8 @@ export default function Header() {
   };
 
   const activeCategoryData = categories.find(cat => cat.id === activeCategory);
-  const displayName = user?.name || user?.email || `+91 ${user?.phone || ''}`;
-  const displayInitials = user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : user?.email?.[0].toUpperCase() || 'U';
+  const displayName = 'User';
+  const displayInitials = 'U';
 
   return (
     <>
