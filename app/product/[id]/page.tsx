@@ -6,6 +6,12 @@ import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
 import { getProductById } from '../../../utils/catalog';
+import {
+  DEFAULT_COUPON_CODE,
+  DEFAULT_COUPON_DISCOUNT,
+  DEFAULT_COUPON_MIN_CART_TOTAL,
+  isDefaultCouponEligibleProduct,
+} from '../../../utils/coupons';
 import { ArrowLeft, ShoppingBag, Star, Zap } from 'lucide-react';
 
 export default function ProductPage() {
@@ -51,6 +57,7 @@ export default function ProductPage() {
   }
 
   const discountPercent = Math.round((1 - product.price / product.originalPrice) * 100);
+  const showCouponInfo = isDefaultCouponEligibleProduct(product);
 
   return (
     <div className="min-h-screen gradient-bg">
@@ -91,12 +98,21 @@ export default function ProductPage() {
                   </div>
                   <span className="text-sm text-gray-500">{product.rating} ({product.reviewCount} reviews)</span>
                 </div>
-                <div className="flex items-baseline gap-3 mb-6">
+                <div className="flex items-baseline gap-3 mb-2">
                   <span className="text-2xl font-bold text-gray-900">₹{product.price.toFixed(2)}</span>
                   {product.originalPrice > product.price && (
                     <span className="text-base text-gray-400 line-through font-medium">₹{product.originalPrice.toFixed(2)}</span>
                   )}
                 </div>
+                {showCouponInfo && (
+                  <div className="mb-6">
+                    <p className="text-sm text-emerald-700 font-medium">
+                      Apply coupon {DEFAULT_COUPON_CODE} &amp; get ₹
+                      {DEFAULT_COUPON_DISCOUNT.toLocaleString('en-IN')} OFF (Valid on orders above ₹
+                      {DEFAULT_COUPON_MIN_CART_TOTAL.toLocaleString('en-IN')})
+                    </p>
+                  </div>
+                )}
                 <div className="mt-auto flex flex-row gap-3">
                   <button onClick={() => { addToCart(); router.push('/cart'); }} className="flex-1 bg-rose-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-rose-600 transition-colors flex items-center justify-center gap-2">
                     <Zap className="w-5 h-5" /> Buy Now

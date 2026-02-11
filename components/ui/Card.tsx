@@ -3,6 +3,11 @@
 import Link from 'next/link';
 import { MapPin, Eye, Zap } from 'lucide-react';
 import type { Product, BeautyService } from '../../utils/catalog';
+import {
+  DEFAULT_COUPON_CODE,
+  DEFAULT_COUPON_DISCOUNT,
+  isDefaultCouponEligibleProduct,
+} from '../../utils/coupons';
 
 const cardBaseClass =
   'group bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden border border-rose-100/80 flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:shadow-rose-100/40 hover:border-rose-200/80';
@@ -24,6 +29,8 @@ export type CardProps = ProductCardProps | ServiceCardProps;
 export function Card(props: CardProps) {
   if (props.variant === 'product') {
     const { item: product, onBuyNow } = props;
+    const showCouponBadge = isDefaultCouponEligibleProduct(product);
+
     return (
       <article className={cardBaseClass}>
         <div className="relative aspect-square sm:aspect-[4/3] overflow-hidden bg-rose-50/60">
@@ -47,6 +54,17 @@ export function Card(props: CardProps) {
               </span>
             )}
           </div>
+          {showCouponBadge && (
+            <div className="mt-2">
+              <div className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1">
+                <span className="mr-1.5">🎟</span>₹
+                {DEFAULT_COUPON_DISCOUNT.toLocaleString('en-IN')} OFF Available
+              </div>
+              <p className="mt-1 text-[11px] text-emerald-700">
+                Use Code: <span className="font-semibold">{DEFAULT_COUPON_CODE}</span>
+              </p>
+            </div>
+          )}
           <div className="mt-4 flex-1 flex flex-row flex-nowrap items-stretch gap-2 md:gap-3 min-w-0">
             <button
               type="button"
