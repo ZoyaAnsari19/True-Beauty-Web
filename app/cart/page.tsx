@@ -221,7 +221,7 @@ export default function CartPage() {
                 ))}
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm border border-rose-100 p-6 sticky bottom-4 space-y-4">
+              <div className="bg-white rounded-xl shadow-sm border border-rose-100 p-6 space-y-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Tag className="w-4 h-4 text-rose-500" />
