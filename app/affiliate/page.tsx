@@ -113,8 +113,15 @@ export default function AffiliatePage() {
       <div className="pt-24 pb-12">
         <div className="container mx-auto px-4 md:px-8">
         <div className="md:hidden mb-4">
-          <Link href="/" className="inline-flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">Back to home</span>
+          </Link>
+        </div>
+        <div className="hidden md:block lg:hidden mb-4">
+          <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">Back to home</span>
           </Link>
         </div>
         <div className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
