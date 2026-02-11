@@ -53,7 +53,7 @@ export default function Home() {
   });
 
   const servicesForCategory = useMemo(
-    () => getServicesByCategory(selectedCategory).slice(0, 8),
+    () => getServicesByCategory(selectedCategory).slice(0, 6),
     [selectedCategory]
   );
 
@@ -217,9 +217,9 @@ export default function Home() {
                       categorySlug={selectedCategory === 'all' ? undefined : selectedCategory}
                       hideHeader
                       subtitle="Premium beauty picks, tailored to your chosen category."
-                      limit={8}
+                      limit={6}
                       showViewAll
-                      columnsLg={4}
+                      columnsLg={3}
                     />
                   </Suspense>
                 </div>
@@ -248,7 +248,7 @@ export default function Home() {
                     </div>
                   ) : (
                     <>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                         {servicesForCategory.map((service) => (
                           <Card
                             key={service.id}
