@@ -136,8 +136,15 @@ export default function Header() {
   };
 
   const activeCategoryData = categories.find(cat => cat.id === activeCategory);
-  const displayName = 'User';
-  const displayInitials = 'U';
+  const displayInitials =
+    user?.name
+      ? user.name
+          .split(' ')
+          .map((n: string) => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2)
+      : user?.email?.[0]?.toUpperCase() || 'U';
 
   return (
     <>
@@ -158,10 +165,15 @@ export default function Header() {
             <div className="hidden lg:flex items-center space-x-0.5 lg:space-x-1 xl:space-x-1.5">
               {isLoggedIn && user ? (
                 <div className="relative" ref={profileDropdownRef}>
-                  <button type="button" onClick={() => setProfileDropdownOpen(!profileDropdownOpen)} className="flex items-center gap-1 lg:gap-1.5 xl:gap-2 px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 xl:py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className="w-6 h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white text-[10px] lg:text-xs xl:text-sm font-semibold flex-shrink-0">{displayInitials}</div>
-                    <span className="hidden xl:block text-xs xl:text-sm font-medium text-gray-700 max-w-[80px] xl:max-w-[120px] truncate">{displayName}</span>
-                    <ChevronDown className={`w-3 h-3 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 text-gray-500 transition-transform flex-shrink-0 ${profileDropdownOpen ? 'transform rotate-180' : ''}`} />
+                  <button
+                    type="button"
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="flex items-center px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 xl:py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    aria-label="User menu"
+                  >
+                    <div className="w-6 h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white text-[10px] lg:text-xs xl:text-sm font-semibold flex-shrink-0">
+                      {displayInitials}
+                    </div>
                   </button>
                   {profileDropdownOpen && (
                     <>
