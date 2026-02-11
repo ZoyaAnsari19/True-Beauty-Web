@@ -124,6 +124,12 @@ export default function AffiliatePage() {
             <span className="text-sm font-medium text-gray-700">Back to home</span>
           </Link>
         </div>
+        <div className="hidden lg:block mb-4">
+          <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">Back to home</span>
+          </Link>
+        </div>
         <div className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-playfair font-bold text-gray-800 mb-2">Affiliate Dashboard</h1>

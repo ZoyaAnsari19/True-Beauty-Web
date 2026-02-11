@@ -209,6 +209,12 @@ export default function ProfilePage() {
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
           </div>
+          <div className="hidden lg:block mb-4">
+            <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Back to home</span>
+            </Link>
+          </div>
           {isFirstTime ? (
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-rose-100/80 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6">
               <div className="mb-6 sm:mb-8">

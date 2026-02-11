@@ -42,14 +42,16 @@ export default function CartPage() {
       <Header />
       <main className="pt-24 pb-16 px-4 md:px-8">
         <div className="container mx-auto max-w-4xl">
-          <div className="md:hidden mb-4">
-            <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <div className="mb-4">
+            <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden">
               <ArrowLeft className="w-5 h-5 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">Back to home</span>
             </Link>
-          </div>
-          <div className="hidden md:block lg:hidden mb-4">
-            <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <Link href="/" className="hidden md:inline-flex lg:hidden items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Back to home</span>
+            </Link>
+            <Link href="/" className="hidden lg:inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <ArrowLeft className="w-5 h-5 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">Back to home</span>
             </Link>

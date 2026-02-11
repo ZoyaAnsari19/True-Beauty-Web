@@ -179,6 +179,12 @@ export default function WishlistPage() {
               <span className="text-sm font-medium text-gray-700">Back to home</span>
             </Link>
           </div>
+          <div className="hidden lg:block mb-4">
+            <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Back to home</span>
+            </Link>
+          </div>
           <div className="mb-8">
             <h1 className="text-2xl md:text-3xl font-playfair font-bold text-gray-800">My Wishlist</h1>
             <p className="text-gray-600 mt-1">

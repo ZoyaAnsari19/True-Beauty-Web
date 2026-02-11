@@ -98,6 +98,10 @@ export default function PricingPage() {
               <ArrowLeft className="w-5 h-5 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">Back to home</span>
             </Link>
+            <Link href="/" className="hidden lg:inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Back to home</span>
+            </Link>
           </div>
           {/* Theme Purchase Banner */}
           {themeToPurchase && (
