@@ -12,7 +12,7 @@ import {
   DEFAULT_COUPON_MIN_CART_TOTAL,
   isDefaultCouponEligibleProduct,
 } from '../../../utils/coupons';
-import { ArrowLeft, ShoppingBag, Star, Zap, Image as ImageIcon, MessageSquare, CheckCircle, Instagram, Youtube, Link2 } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Star, Zap, Image as ImageIcon, MessageSquare, CheckCircle, Instagram, Youtube, Facebook, Twitter, Link2 } from 'lucide-react';
 import type { Product } from '../../../utils/catalog';
 
 // Category-wise demo videos (how to use). Paths under public/ are served from root.
@@ -100,7 +100,7 @@ const MOCK_REVIEWS: Review[] = [
 
 type SharedPhoto = { id: string; objectUrl: string; name?: string };
 
-type SharedSocialPost = { id: string; platform: 'instagram' | 'youtube'; url: string; label?: string };
+type SharedSocialPost = { id: string; platform: 'instagram' | 'youtube' | 'facebook' | 'twitter'; url: string; label?: string };
 
 export default function ProductPage() {
   const params = useParams();
@@ -115,6 +115,8 @@ export default function ProductPage() {
   const [submitted, setSubmitted] = useState(false);
   const [connectedInstagram, setConnectedInstagram] = useState(false);
   const [connectedYouTube, setConnectedYouTube] = useState(false);
+  const [connectedFacebook, setConnectedFacebook] = useState(false);
+  const [connectedTwitter, setConnectedTwitter] = useState(false);
   const [sharedSocialPosts, setSharedSocialPosts] = useState<SharedSocialPost[]>([]);
   const [socialPostUrl, setSocialPostUrl] = useState('');
   const product = getProductById(params.id as string);
@@ -163,10 +165,12 @@ export default function ProductPage() {
     setSubmitted(true);
   };
 
-  const getSocialPlatform = (url: string): 'instagram' | 'youtube' | null => {
+  const getSocialPlatform = (url: string): 'instagram' | 'youtube' | 'facebook' | 'twitter' | null => {
     const u = url.trim().toLowerCase();
     if (u.includes('instagram.com')) return 'instagram';
     if (u.includes('youtube.com') || u.includes('youtu.be')) return 'youtube';
+    if (u.includes('facebook.com') || u.includes('fb.watch')) return 'facebook';
+    if (u.includes('twitter.com') || u.includes('x.com')) return 'twitter';
     return null;
   };
 
@@ -178,11 +182,13 @@ export default function ProductPage() {
     if (!platform) return;
     if (platform === 'instagram' && !connectedInstagram) return;
     if (platform === 'youtube' && !connectedYouTube) return;
+    if (platform === 'facebook' && !connectedFacebook) return;
+    if (platform === 'twitter' && !connectedTwitter) return;
     setSharedSocialPosts((prev) => [...prev, { id: `social-${Date.now()}`, platform, url }]);
     setSocialPostUrl('');
   };
 
-  const hasAnySocialConnected = connectedInstagram || connectedYouTube;
+  const hasAnySocialConnected = connectedInstagram || connectedYouTube || connectedFacebook || connectedTwitter;
   const canShareSocial = isVerifiedBuyer && hasAnySocialConnected;
 
   if (!product) {
@@ -448,6 +454,32 @@ export default function ProductPage() {
                       >
                         <Youtube className="w-5 h-5" />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => isVerifiedBuyer && setConnectedFacebook((c) => !c)}
+                        disabled={!isVerifiedBuyer}
+                        title={connectedFacebook ? 'Connected' : 'Connect Facebook'}
+                        className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                          connectedFacebook
+                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                        }`}
+                      >
+                        <Facebook className="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => isVerifiedBuyer && setConnectedTwitter((c) => !c)}
+                        disabled={!isVerifiedBuyer}
+                        title={connectedTwitter ? 'Connected' : 'Connect Twitter'}
+                        className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                          connectedTwitter
+                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                        }`}
+                      >
+                        <Twitter className="w-5 h-5" />
+                      </button>
                     </div>
                   </div>
 
@@ -457,7 +489,7 @@ export default function ProductPage() {
                       <form onSubmit={handleShareSocialPost} className="flex flex-wrap items-end gap-2">
                         <input
                           type="url"
-                          placeholder="Paste Instagram or YouTube post/video URL"
+                          placeholder="Paste Instagram, YouTube, Facebook or Twitter post URL"
                           value={socialPostUrl}
                           onChange={(e) => setSocialPostUrl(e.target.value)}
                           disabled={!canShareSocial}
@@ -471,7 +503,7 @@ export default function ProductPage() {
                           Share
                         </button>
                       </form>
-                      <p className="text-xs text-gray-500 mt-1.5">Paste a link to your Instagram post or YouTube video about this product.</p>
+                      <p className="text-xs text-gray-500 mt-1.5">Paste a link to your Instagram, YouTube, Facebook or Twitter post about this product.</p>
                     </div>
                   )}
 
@@ -482,8 +514,14 @@ export default function ProductPage() {
                         {sharedSocialPosts.map((post) => (
                           <li key={post.id} className="flex items-center gap-2 flex-wrap">
                             <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-100 text-xs font-medium">
-                              {post.platform === 'instagram' ? <Instagram className="w-3.5 h-3.5" /> : <Youtube className="w-3.5 h-3.5" />}
-                              {post.platform === 'instagram' ? 'Instagram' : 'YouTube'}
+                              {post.platform === 'instagram' && <Instagram className="w-3.5 h-3.5" />}
+                              {post.platform === 'youtube' && <Youtube className="w-3.5 h-3.5" />}
+                              {post.platform === 'facebook' && <Facebook className="w-3.5 h-3.5" />}
+                              {post.platform === 'twitter' && <Twitter className="w-3.5 h-3.5" />}
+                              {post.platform === 'instagram' && 'Instagram'}
+                              {post.platform === 'youtube' && 'YouTube'}
+                              {post.platform === 'facebook' && 'Facebook'}
+                              {post.platform === 'twitter' && 'Twitter'}
                             </span>
                             <a
                               href={post.url}
