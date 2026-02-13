@@ -108,6 +108,7 @@ export default function ProductPage() {
   const [isClient, setIsClient] = useState(false);
   const [cartVersion, setCartVersion] = useState(0);
   const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const [sharedPhotos, setSharedPhotos] = useState<SharedPhoto[]>([]);
   const [reviewText, setReviewText] = useState('');
   const [reviewRating, setReviewRating] = useState<number | null>(null);
@@ -313,7 +314,7 @@ export default function ProductPage() {
               <section>
                 <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-4">Customer reviews</h2>
                 <ul className="space-y-4">
-                  {reviews.map((r) => (
+                  {(showAllReviews ? reviews : reviews.slice(0, 3)).map((r) => (
                     <li key={r.id} className="border-b border-rose-100/80 pb-4 last:border-0 last:pb-0">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="flex">
@@ -333,6 +334,17 @@ export default function ProductPage() {
                     </li>
                   ))}
                 </ul>
+                {reviews.length > 3 && (
+                  <div className="mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowAllReviews((v) => !v)}
+                      className="text-sm font-medium text-rose-600 hover:text-rose-700 hover:underline"
+                    >
+                      {showAllReviews ? 'Show less' : 'Show more…'}
+                    </button>
+                  </div>
+                )}
               </section>
 
               {/* Verified buyers: upload/share video + write review */}
