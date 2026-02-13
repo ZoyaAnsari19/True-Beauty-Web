@@ -26,15 +26,68 @@ const CATEGORY_VIDEOS: Record<string, Record<number, string>> = {
     6: '/productsVideo/skincare/Moisturizer.mp4',
     // 7 toner, 8 faceMask, 9 lipBalm – fallback to dayCream
   },
+  makeup: {
+    12: '/productsVideo/makeup/Foundation & Glow.mp4',
+    13: '/productsVideo/makeup/Lip & Cheek Palette.mp4',
+    14: '/productsVideo/makeup/Eyeshadow Palette.mp4',
+  },
+  jewellery: {
+    10: '/productsVideo/jewellery/Classic Pearl Studs.mp4',
+    11: '/productsVideo/jewellery/Rose Gold Pendant.mp4',
+    32: '/productsVideo/jewellery/Statement Ring.mp4',
+  },
+  wellness: {
+    25: '/productsVideo/wellness/Vitamins & Supplements.mp4',
+    26: '/productsVideo/wellness/Hair & Skin Gummies.mp4',
+    27: '/productsVideo/wellness/herbalTeas.mp4',
+    28: '/productsVideo/wellness/Wellness Kit.mp4',
+  },
+  haircare: {
+    19: '/productsVideo/haircare/HairShampoo.mp4',
+    20: '/productsVideo/haircare/Hair Conditioner.mp4',
+    21: '/productsVideo/haircare/hairOil.mp4',
+  },
+  gifting: {
+    29: '/productsVideo/gifting/Skincare Gift Set.mp4',
+    30: '/productsVideo/gifting/Luxury Gift Box.mp4',
+    31: '/productsVideo/gifting/Personalized Gift.mp4',
+  },
+  fragrance: {
+    22: '/productsVideo/fragrance/Perfume.mp4',
+    23: '/productsVideo/fragrance/Body Mist.mp4',
+    24: '/productsVideo/fragrance/Roll-On Perfume.mp4',
+  },
+  'bath-body': {
+    15: '/productsVideo/body&bath/bodyWash.mp4',
+    16: '/productsVideo/body&bath/bodyLotion.mp4',
+    17: '/productsVideo/body&bath/BodyScrub.mp4',
+    18: '/productsVideo/body&bath/soapBar.mp4',
+  },
 };
+
 const SKINCARE_DEFAULT_VIDEO = '/productsVideo/skincare/dayCream.mp4';
+const MAKEUP_DEFAULT_VIDEO = '/productsVideo/makeup/Foundation & Glow.mp4';
+const JEWELLERY_DEFAULT_VIDEO = '/productsVideo/jewellery/Classic Pearl Studs.mp4';
+const WELLNESS_DEFAULT_VIDEO = '/productsVideo/wellness/Vitamins & Supplements.mp4';
+const HAIRCARE_DEFAULT_VIDEO = '/productsVideo/haircare/HairShampoo.mp4';
+const GIFTING_DEFAULT_VIDEO = '/productsVideo/gifting/Skincare Gift Set.mp4';
+const FRAGRANCE_DEFAULT_VIDEO = '/productsVideo/fragrance/Perfume.mp4';
+const BATH_BODY_DEFAULT_VIDEO = '/productsVideo/body&bath/bodyWash.mp4';
 
 function getProductDemoVideo(product: Product): string | null {
   const byCategory = CATEGORY_VIDEOS[product.category];
-  if (!byCategory) return null;
-  const exact = byCategory[product.id];
+  const exact = byCategory?.[product.id];
   if (exact) return exact;
+
   if (product.category === 'skincare') return SKINCARE_DEFAULT_VIDEO;
+  if (product.category === 'makeup') return MAKEUP_DEFAULT_VIDEO;
+  if (product.category === 'jewellery') return JEWELLERY_DEFAULT_VIDEO;
+  if (product.category === 'wellness') return WELLNESS_DEFAULT_VIDEO;
+  if (product.category === 'haircare') return HAIRCARE_DEFAULT_VIDEO;
+  if (product.category === 'gifting') return GIFTING_DEFAULT_VIDEO;
+  if (product.category === 'fragrance') return FRAGRANCE_DEFAULT_VIDEO;
+  if (product.category === 'bath-body') return BATH_BODY_DEFAULT_VIDEO;
+
   return null;
 }
 
