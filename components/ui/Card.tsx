@@ -33,57 +33,66 @@ export function Card(props: CardProps) {
 
     return (
       <article className={cardBaseClass}>
-        <div className="relative aspect-square sm:aspect-[4/3] overflow-hidden bg-rose-50/60">
+        <Link
+          href={`/product/${product.id}`}
+          className="relative block aspect-square sm:aspect-[4/3] overflow-hidden bg-rose-50/60"
+        >
           <img
             src={product.image}
             alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-        </div>
-        <div className="flex flex-col flex-1 p-4 sm:p-5 min-h-0 min-w-0 overflow-hidden">
-          <h3 className="font-playfair font-semibold text-gray-800 text-base sm:text-lg leading-tight line-clamp-2">
+        </Link>
+        <div className="flex flex-col flex-1 p-3 sm:p-4 min-h-0 min-w-0 overflow-hidden">
+          <h3 className="font-playfair font-semibold text-gray-800 text-sm sm:text-base md:text-lg leading-snug line-clamp-2">
             {product.name}
           </h3>
           <div className="mt-2 flex items-start justify-between gap-2">
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-gray-900">
+            <div className="flex items-baseline gap-1.5 sm:gap-2">
+              <span className="text-base sm:text-lg font-bold text-gray-900">
                 ₹{product.price.toLocaleString('en-IN')}
               </span>
               {product.originalPrice > product.price && (
-                <span className="text-sm text-gray-400 line-through">
+                <span className="text-xs sm:text-sm text-gray-400 line-through">
                   ₹{product.originalPrice.toLocaleString('en-IN')}
                 </span>
               )}
             </div>
             {showCouponBadge && (
-              <div className="flex flex-col items-end">
+              <div className="hidden sm:flex flex-col items-end">
                 <div className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold px-2 py-0.5">
                   <span className="mr-1">🎟</span>₹
-                  {DEFAULT_COUPON_DISCOUNT.toLocaleString('en-IN')} OFF Available
+                  {DEFAULT_COUPON_DISCOUNT.toLocaleString('en-IN')} OFF
                 </div>
                 <p className="mt-0.5 text-[10px] text-emerald-700">
-                  Use Code: <span className="font-semibold">{DEFAULT_COUPON_CODE}</span>
+                  Code: <span className="font-semibold">{DEFAULT_COUPON_CODE}</span>
                 </p>
               </div>
             )}
           </div>
-          <div className="mt-4 flex-1 flex flex-row flex-nowrap items-stretch gap-2 md:gap-3 min-w-0">
+          <div className="mt-3 flex flex-col gap-2 sm:mt-4 sm:flex-row sm:items-stretch sm:gap-3 min-w-0">
             <button
               type="button"
               onClick={() => onBuyNow(product)}
-              className="flex-1 min-w-0 md:min-w-[110px] max-w-[180px] h-12 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-rose-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
+              className="w-full sm:flex-1 min-w-0 h-10 sm:h-11 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-rose-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
             >
               <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
               Buy Now
             </button>
             <Link
               href={`/product/${product.id}`}
-              className="flex-1 min-w-0 md:min-w-[110px] max-w-[180px] h-12 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-blue-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-blue-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
+              className="hidden sm:inline-flex sm:flex-1 min-w-0 h-11 px-3 md:px-4 items-center justify-center gap-1.5 md:gap-2 bg-blue-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-blue-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
             >
               <Eye className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
               View Details
             </Link>
           </div>
+          <Link
+            href={`/product/${product.id}`}
+            className="mt-1 inline-block text-[11px] text-rose-600 hover:text-rose-700 hover:underline sm:hidden"
+          >
+            View details
+          </Link>
         </div>
       </article>
     );

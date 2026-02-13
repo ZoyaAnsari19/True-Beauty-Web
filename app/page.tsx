@@ -217,7 +217,7 @@ export default function Home() {
                       categorySlug={selectedCategory === 'all' ? undefined : selectedCategory}
                       hideHeader
                       subtitle="Premium beauty picks, tailored to your chosen category."
-                      limit={6}
+                      limit={4}
                       showViewAll
                       columnsLg={3}
                     />
@@ -249,13 +249,17 @@ export default function Home() {
                   ) : (
                     <>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-                        {servicesForCategory.map((service) => (
-                          <Card
+                        {servicesForCategory.map((service, index) => (
+                          <div
                             key={service.id}
-                            variant="service"
-                            item={service}
-                            onBook={() => handleOpenBooking(service)}
-                          />
+                            className={index >= 2 ? 'hidden sm:block' : ''}
+                          >
+                            <Card
+                              variant="service"
+                              item={service}
+                              onBook={() => handleOpenBooking(service)}
+                            />
+                          </div>
                         ))}
                       </div>
                       <div className="mt-6 md:mt-8 flex justify-center">

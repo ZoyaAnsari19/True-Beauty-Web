@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { products, getProductsByCategory } from '../utils/catalog';
@@ -56,13 +56,26 @@ export default function ProductGrid({
     router.push('/cart');
   };
 
-  const filteredProducts = useMemo(() => {
+  const allProducts = useMemo(() => {
     let list: Product[];
     if (productsProp) list = productsProp;
-    else if (categoryFromUrl) list = getProductsByCategory(categoryFromUrl, subcategoryFromUrl || undefined);
+    else if (categoryFromUrl)
+      list = getProductsByCategory(categoryFromUrl, subcategoryFromUrl || undefined);
     else list = products;
-    return limit != null && limit > 0 ? list.slice(0, limit) : list;
-  }, [productsProp, categoryFromUrl, subcategoryFromUrl, limit]);
+    return list;
+  }, [productsProp, categoryFromUrl, subcategoryFromUrl]);
+
+  const initialVisible = limit != null && limit > 0 ? limit : allProducts.length;
+  const [visibleCount, setVisibleCount] = useState(initialVisible);
+
+  useEffect(() => {
+    setVisibleCount(limit != null && limit > 0 ? limit : allProducts.length);
+  }, [limit, allProducts.length]);
+
+  const visibleProducts = useMemo(
+    () => allProducts.slice(0, Math.min(visibleCount, allProducts.length)),
+    [allProducts, visibleCount]
+  );
 
   useEffect(() => {
     if (!categoryFromUrl || typeof document === 'undefined') return;
@@ -72,7 +85,9 @@ export default function ProductGrid({
 
   const title = titleProp ?? (categoryFromUrl ? `Showing ${getCategoryNameBySlug(categoryFromUrl)} Products` : 'Shop Our Collection');
   const showSubtitle = subtitle && !categoryFromUrl;
-  const showEmptyState = filteredProducts.length === 0;
+  const showEmptyState = allProducts.length === 0;
+
+  const hasMoreToShow = visibleCount < allProducts.length;
 
   return (
     <div className="w-full">
@@ -103,8 +118,12 @@ export default function ProductGrid({
         </div>
       ) : (
         <>
-          <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 ${columnsLg === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
-            {filteredProducts.map((product) => (
+          <div
+            className={`grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 ${
+              columnsLg === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
+            }`}
+          >
+            {visibleProducts.map((product) => (
               <Card
                 key={product.id}
                 variant="product"
@@ -113,14 +132,29 @@ export default function ProductGrid({
               />
             ))}
           </div>
-          {showViewAll && limit != null && limit > 0 && (
-            <div className="mt-6 md:mt-8 flex justify-center">
-              <Link
-                href="/products"
-                className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
-              >
-                View All Products
-              </Link>
+          {(hasMoreToShow || (showViewAll && limit != null && limit > 0)) && (
+            <div className="mt-5 md:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              {hasMoreToShow && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVisibleCount((current) =>
+                      Math.min(current + (limit || 4), allProducts.length)
+                    )
+                  }
+                  className="inline-flex items-center justify-center rounded-full border border-rose-300 bg-white/80 text-rose-700 px-6 py-2.5 text-sm font-medium hover:bg-rose-50 transition-colors duration-200"
+                >
+                  Load More
+                </button>
+              )}
+              {showViewAll && limit != null && limit > 0 && (
+                <Link
+                  href="/products"
+                  className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
+                >
+                  View All Products
+                </Link>
+              )}
             </div>
           )}
         </>
