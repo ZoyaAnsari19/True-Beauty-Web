@@ -12,14 +12,62 @@ import {
   DEFAULT_COUPON_MIN_CART_TOTAL,
   isDefaultCouponEligibleProduct,
 } from '../../../utils/coupons';
-import { ArrowLeft, ShoppingBag, Star, Zap } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Star, Zap, Image as ImageIcon, MessageSquare, CheckCircle, Instagram, Youtube, Link2 } from 'lucide-react';
+import type { Product } from '../../../utils/catalog';
+
+// Category-wise demo videos (how to use). Paths under public/ are served from root.
+const CATEGORY_VIDEOS: Record<string, Record<number, string>> = {
+  skincare: {
+    1: '/productsVideo/skincare/dayCream.mp4',
+    2: '/productsVideo/skincare/nightCream.mp4',
+    3: '/productsVideo/skincare/sunscream.mp4',
+    4: '/productsVideo/skincare/faceWash.mp4',
+    5: '/productsVideo/skincare/serum.mp4',
+    6: '/productsVideo/skincare/Moisturizer.mp4',
+    // 7 toner, 8 faceMask, 9 lipBalm – fallback to dayCream
+  },
+};
+const SKINCARE_DEFAULT_VIDEO = '/productsVideo/skincare/dayCream.mp4';
+
+function getProductDemoVideo(product: Product): string | null {
+  const byCategory = CATEGORY_VIDEOS[product.category];
+  if (!byCategory) return null;
+  const exact = byCategory[product.id];
+  if (exact) return exact;
+  if (product.category === 'skincare') return SKINCARE_DEFAULT_VIDEO;
+  return null;
+}
+
+type Review = { id: string; author: string; rating: number; text: string; date: string; verified?: boolean };
+const MOCK_REVIEWS: Review[] = [
+  { id: '1', author: 'Priya S.', rating: 5, text: 'Lightweight and absorbs quickly. My skin feels hydrated all day. Will repurchase!', date: '2 days ago', verified: true },
+  { id: '2', author: 'Anita M.', rating: 4, text: 'Good texture and no breakouts. Only wish the tube was a bit bigger for the price.', date: '1 week ago', verified: true },
+  { id: '3', author: 'Riya K.', rating: 5, text: 'Perfect for combination skin. Works well under makeup. Highly recommend.', date: '2 weeks ago', verified: true },
+];
+
+type SharedPhoto = { id: string; objectUrl: string; name?: string };
+
+type SharedSocialPost = { id: string; platform: 'instagram' | 'youtube'; url: string; label?: string };
 
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [cartVersion, setCartVersion] = useState(0);
+  const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
+  const [sharedPhotos, setSharedPhotos] = useState<SharedPhoto[]>([]);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState<number | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [connectedInstagram, setConnectedInstagram] = useState(false);
+  const [connectedYouTube, setConnectedYouTube] = useState(false);
+  const [sharedSocialPosts, setSharedSocialPosts] = useState<SharedSocialPost[]>([]);
+  const [socialPostUrl, setSocialPostUrl] = useState('');
   const product = getProductById(params.id as string);
+  const isVerifiedBuyer = isClient && product ? (() => {
+    const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
+    return cart.some((p: { id: number }) => p.id === product.id);
+  })() : false;
 
   useEffect(() => {
     setIsClient(true);
@@ -41,6 +89,48 @@ export default function ProductPage() {
     return cart.some((p: { id: number }) => p.id === product.id);
   };
 
+  const handleUploadPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !isVerifiedBuyer) return;
+    const objectUrl = URL.createObjectURL(file);
+    setSharedPhotos((prev) => [...prev, { id: `photo-${Date.now()}`, objectUrl, name: file.name }]);
+    e.target.value = '';
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isVerifiedBuyer || reviewRating === null || !reviewText.trim()) return;
+    setReviews((prev) => [
+      { id: String(Date.now()), author: 'You', rating: reviewRating, text: reviewText.trim(), date: 'Just now', verified: true },
+      ...prev,
+    ]);
+    setReviewText('');
+    setReviewRating(null);
+    setSubmitted(true);
+  };
+
+  const getSocialPlatform = (url: string): 'instagram' | 'youtube' | null => {
+    const u = url.trim().toLowerCase();
+    if (u.includes('instagram.com')) return 'instagram';
+    if (u.includes('youtube.com') || u.includes('youtu.be')) return 'youtube';
+    return null;
+  };
+
+  const handleShareSocialPost = (e: React.FormEvent) => {
+    e.preventDefault();
+    const url = socialPostUrl.trim();
+    if (!url || !isVerifiedBuyer) return;
+    const platform = getSocialPlatform(url);
+    if (!platform) return;
+    if (platform === 'instagram' && !connectedInstagram) return;
+    if (platform === 'youtube' && !connectedYouTube) return;
+    setSharedSocialPosts((prev) => [...prev, { id: `social-${Date.now()}`, platform, url }]);
+    setSocialPostUrl('');
+  };
+
+  const hasAnySocialConnected = connectedInstagram || connectedYouTube;
+  const canShareSocial = isVerifiedBuyer && hasAnySocialConnected;
+
   if (!product) {
     return (
       <div className="min-h-screen gradient-bg">
@@ -58,6 +148,7 @@ export default function ProductPage() {
 
   const discountPercent = Math.round((1 - product.price / product.originalPrice) * 100);
   const showCouponInfo = isDefaultCouponEligibleProduct(product);
+  const demoVideoSrc = getProductDemoVideo(product);
 
   return (
     <div className="min-h-screen gradient-bg">
@@ -128,6 +219,223 @@ export default function ProductPage() {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Demo video, reviews & verified buyer section – same card style as above */}
+          <div className="mt-6 md:mt-8 bg-white/95 rounded-2xl border border-rose-100 shadow-sm overflow-hidden">
+            <div className="p-6 md:p-8 space-y-8">
+              {/* How to use – auto-play product video + scrollable shared videos */}
+              <section>
+                <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-3">How to use</h2>
+                {demoVideoSrc && (
+                  <div className="rounded-xl overflow-hidden bg-rose-50/60 aspect-video max-w-2xl mx-auto mb-4">
+                    <video
+                      src={demoVideoSrc}
+                      className="w-full h-full object-contain"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      controls
+                      title="Product demo"
+                    />
+                  </div>
+                )}
+                {sharedPhotos.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Shared by buyers</p>
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-rose-200 scrollbar-track-transparent">
+                      {sharedPhotos.map((p) => (
+                        <div key={p.id} className="flex-shrink-0 w-48 sm:w-56 rounded-xl overflow-hidden border border-rose-100 bg-rose-50/60">
+                          <img src={p.objectUrl} alt={p.name || 'Shared photo'} className="w-full aspect-square object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* Customer reviews list */}
+              <section>
+                <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-4">Customer reviews</h2>
+                <ul className="space-y-4">
+                  {reviews.map((r) => (
+                    <li key={r.id} className="border-b border-rose-100/80 pb-4 last:border-0 last:pb-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="flex">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} className={`w-4 h-4 ${star <= r.rating ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}`} />
+                          ))}
+                        </div>
+                        <span className="text-sm font-medium text-gray-700">{r.author}</span>
+                        {r.verified && (
+                          <span className="inline-flex items-center gap-0.5 text-xs text-emerald-600">
+                            <CheckCircle className="w-3.5 h-3.5" /> Verified
+                          </span>
+                        )}
+                        <span className="text-xs text-gray-400 ml-auto">{r.date}</span>
+                      </div>
+                      <p className="text-sm text-gray-600">{r.text}</p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* Verified buyers: upload/share video + write review */}
+              <section className="pt-4 border-t border-rose-100">
+                <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-2">Verified buyers</h2>
+                {!isVerifiedBuyer && (
+                  <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
+                    Only verified buyers can share photos or write reviews. Add this product to cart to submit.
+                  </p>
+                )}
+
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Upload photo</p>
+                    <label
+                      htmlFor="verified-photo-upload"
+                      className={`inline-flex flex-col sm:flex-row items-start sm:items-center gap-2 ${!isVerifiedBuyer ? 'opacity-60 pointer-events-none' : ''} cursor-pointer`}
+                    >
+                      <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-sm font-medium hover:bg-rose-100 transition-colors">
+                        <ImageIcon className="w-4 h-4" /> Choose photo
+                      </span>
+                      <input
+                        id="verified-photo-upload"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        disabled={!isVerifiedBuyer}
+                        onChange={handleUploadPhoto}
+                        className="sr-only"
+                      />
+                      <span className="text-xs text-gray-500">JPG, PNG, WebP or GIF.</span>
+                    </label>
+                  </div>
+
+                  <form onSubmit={handleSubmitReview}>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Write a review</p>
+                    <div className="flex gap-1 mb-2" role="group" aria-label="Rating">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => isVerifiedBuyer && setReviewRating(star)}
+                          disabled={!isVerifiedBuyer}
+                          className="p-0.5 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          <Star className={`w-6 h-6 transition-colors ${reviewRating !== null && star <= reviewRating ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}`} />
+                        </button>
+                      ))}
+                    </div>
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      placeholder="Share your experience with this product..."
+                      rows={4}
+                      disabled={!isVerifiedBuyer}
+                      className="w-full px-3 py-2 rounded-lg border border-rose-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 resize-y mb-3 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      required
+                    />
+                    <button type="submit" disabled={!isVerifiedBuyer || reviewRating === null || !reviewText.trim()} className="inline-flex items-center gap-2 bg-rose-500 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                      <MessageSquare className="w-4 h-4" /> Submit review
+                    </button>
+                    {submitted && <p className="mt-2 text-sm text-emerald-600">Thanks! Your review has been added.</p>}
+                  </form>
+                </div>
+              </section>
+
+              {/* Connect Your Social Media to Share Product Experience */}
+              <section className="pt-4 border-t border-rose-100">
+                <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-2">Connect Your Social Media to Share Product Experience</h2>
+                {!isVerifiedBuyer && (
+                  <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
+                    Only verified buyers can connect social accounts and share posts. Add this product to cart to continue.
+                  </p>
+                )}
+
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => isVerifiedBuyer && setConnectedInstagram((c) => !c)}
+                        disabled={!isVerifiedBuyer}
+                        title={connectedInstagram ? 'Connected' : 'Connect Instagram'}
+                        className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                          connectedInstagram
+                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                        }`}
+                      >
+                        <Instagram className="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => isVerifiedBuyer && setConnectedYouTube((c) => !c)}
+                        disabled={!isVerifiedBuyer}
+                        title={connectedYouTube ? 'Connected' : 'Connect YouTube'}
+                        className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                          connectedYouTube
+                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                        }`}
+                      >
+                        <Youtube className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {hasAnySocialConnected && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-2">Share a post or video from your connected account</p>
+                      <form onSubmit={handleShareSocialPost} className="flex flex-wrap items-end gap-2">
+                        <input
+                          type="url"
+                          placeholder="Paste Instagram or YouTube post/video URL"
+                          value={socialPostUrl}
+                          onChange={(e) => setSocialPostUrl(e.target.value)}
+                          disabled={!canShareSocial}
+                          className="flex-1 min-w-[200px] px-3 py-2 rounded-lg border border-rose-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        />
+                        <button
+                          type="submit"
+                          disabled={!canShareSocial || !socialPostUrl.trim() || !getSocialPlatform(socialPostUrl)}
+                          className="px-4 py-2 rounded-lg bg-rose-500 text-white text-sm font-medium hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Share
+                        </button>
+                      </form>
+                      <p className="text-xs text-gray-500 mt-1.5">Paste a link to your Instagram post or YouTube video about this product.</p>
+                    </div>
+                  )}
+
+                  {sharedSocialPosts.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-2">Shared from your social</p>
+                      <ul className="space-y-2">
+                        {sharedSocialPosts.map((post) => (
+                          <li key={post.id} className="flex items-center gap-2 flex-wrap">
+                            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-100 text-xs font-medium">
+                              {post.platform === 'instagram' ? <Instagram className="w-3.5 h-3.5" /> : <Youtube className="w-3.5 h-3.5" />}
+                              {post.platform === 'instagram' ? 'Instagram' : 'YouTube'}
+                            </span>
+                            <a
+                              href={post.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-sm text-rose-600 hover:underline truncate max-w-full"
+                            >
+                              <Link2 className="w-3.5 h-3.5 flex-shrink-0" />
+                              {post.url}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </section>
             </div>
           </div>
         </div>
