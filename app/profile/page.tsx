@@ -279,7 +279,6 @@ export default function ProfilePage() {
                       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"><Shield className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" /><h2 className="text-lg sm:text-xl md:text-2xl font-playfair font-bold text-gray-800">Security</h2></div>
                       <div className="space-y-4">
                         <div className="p-4 bg-gray-50 rounded-lg"><p className="text-sm text-gray-600 mb-2">Password</p><button className="text-sm text-rose-600 hover:text-rose-700 font-medium">Change Password</button></div>
-                        <div className="p-4 bg-gray-50 rounded-lg"><p className="text-sm text-gray-600 mb-2">Two-Factor Authentication</p><button className="text-sm text-rose-600 hover:text-rose-700 font-medium">Enable 2FA</button></div>
                       </div>
                     </div>
                     <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-rose-100/80 p-4 sm:p-6 md:p-8">

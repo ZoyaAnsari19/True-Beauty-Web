@@ -1,7 +1,7 @@
 'use client';
 
-import { Suspense, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useMemo, useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -41,8 +41,15 @@ function ProductsFallback() {
 
 export default function Home() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [bookingOpen, setBookingOpen] = useState(false);
+
+  // Sync category from URL so header Categories links show the right products
+  useEffect(() => {
+    const cat = searchParams.get('category') || 'all';
+    setSelectedCategory(cat);
+  }, [searchParams]);
   const [selectedService, setSelectedService] = useState<BeautyService | null>(null);
   const [bookingForm, setBookingForm] = useState({
     name: '',
@@ -67,6 +74,8 @@ export default function Home() {
 
   const handleCategoryClick = (slug: string) => {
     setSelectedCategory(slug);
+    const url = slug === 'all' ? '/#products' : `/?category=${slug}#products`;
+    router.replace(url, { scroll: false });
   };
 
   const handleOpenBooking = (service: BeautyService) => {
@@ -216,10 +225,11 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div>
+                <div id="products">
                   <Suspense fallback={<ProductsFallback />}>
                     <ProductGrid
                       categorySlug={selectedCategory === 'all' ? undefined : selectedCategory}
+                      subcategorySlug={searchParams.get('subcategory') || undefined}
                       hideHeader
                       subtitle="Premium beauty picks, tailored to your chosen category."
                       limit={6}
