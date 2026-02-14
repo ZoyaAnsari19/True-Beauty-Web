@@ -156,16 +156,17 @@ export default function AffiliatePage() {
           </div>
         </div>
 
-        {/* Mobile: horizontal scroll; Desktop: grid */}
-        <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory md:overflow-visible md:grid md:grid-cols-2 md:gap-6 lg:grid-cols-3 md:pb-0 [scrollbar-width:thin]">
-          {cards.map((card) => {
-            const IconComponent = card.icon;
-            return (
-              <button
-                key={card.id}
-                onClick={() => setActiveSection(card.id as ActiveSection)}
-                className="flex-shrink-0 w-[85vw] max-w-[280px] snap-start md:w-auto md:max-w-none bg-white/90 border border-rose-100 rounded-xl shadow-sm hover:shadow-md hover:border-rose-200 transition-all duration-300 p-5 md:p-6 text-left cursor-pointer hover:-translate-y-1"
-              >
+        {/* Mobile: horizontal scroll with padding so hover shadow/border isn't clipped on sides; Desktop: grid */}
+        <div className="-mx-2 px-2 md:mx-0 md:px-0">
+          <div className="flex gap-4 overflow-x-auto overflow-y-visible snap-x snap-mandatory py-4 pl-5 pr-5 md:py-0 md:pl-0 md:pr-0 md:overflow-visible md:grid md:grid-cols-2 md:gap-6 lg:grid-cols-3 [scrollbar-width:thin]">
+            {cards.map((card) => {
+              const IconComponent = card.icon;
+              return (
+                <button
+                  key={card.id}
+                  onClick={() => setActiveSection(card.id as ActiveSection)}
+                  className="flex-shrink-0 w-[85vw] max-w-[280px] snap-start md:w-auto md:max-w-none bg-white/90 border border-rose-100 rounded-xl shadow-sm hover:shadow-md hover:border-rose-200 transition-all duration-300 p-5 md:p-6 text-left cursor-pointer hover:-translate-y-1"
+                >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${card.color} flex items-center justify-center flex-shrink-0`}>
@@ -181,6 +182,7 @@ export default function AffiliatePage() {
               </button>
             );
           })}
+          </div>
         </div>
 
         <div className="mt-8">
