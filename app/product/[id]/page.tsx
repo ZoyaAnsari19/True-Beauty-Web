@@ -416,9 +416,9 @@ export default function ProductPage() {
                 </div>
               </section>
 
-              {/* Connect Your Social Media to Share Product Experience */}
+              {/* Visit our social media for more Product Videos */}
               <section className="pt-4 border-t border-rose-100">
-                <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-2">Connect Your Social Media to Share Product Experience</h2>
+                <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-2">Visit our social media for more Product Videos</h2>
                 {!isVerifiedBuyer && (
                   <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
                     Only verified buyers can connect social accounts and share posts. Add this product to cart to continue.

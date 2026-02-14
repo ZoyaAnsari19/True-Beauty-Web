@@ -40,7 +40,7 @@ export function Card(props: CardProps) {
           <img
             src={product.image}
             alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
           />
         </Link>
         <div className="flex flex-col flex-1 p-3 sm:p-4 min-h-0 min-w-0 overflow-hidden">
