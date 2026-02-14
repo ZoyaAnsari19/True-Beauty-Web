@@ -14,6 +14,18 @@ import {
 } from '../../../utils/coupons';
 
 const COUPON_STORAGE_KEY = 'tb_cart_coupon';
+const ORDERS_STORAGE_KEY = 'tb_orders';
+
+type CartItem = { id: number; name: string; price: number; image: string; quantity: number };
+
+export type StoredOrder = {
+  orderId: string;
+  placedAt: string;
+  items: CartItem[];
+  subtotal: number;
+  discount: number;
+  total: number;
+};
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -39,15 +51,14 @@ export default function PaymentPage() {
     const orderId = `TB-ORD-${Date.now()}`;
 
     try {
-      const stored = localStorage.getItem(COUPON_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as { code: string; discount: number };
+      const cart: CartItem[] = JSON.parse(localStorage.getItem('tb_cart') || '[]');
+      const storedCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
+      let discount = 0;
+      if (storedCoupon) {
+        const parsed = JSON.parse(storedCoupon) as { code: string; discount: number };
         if (parsed?.code && typeof parsed.discount === 'number') {
-          moveAppliedCouponToHistoryOnOrderSuccess(
-            orderId,
-            parsed.code,
-            parsed.discount
-          );
+          discount = parsed.discount;
+          moveAppliedCouponToHistoryOnOrderSuccess(orderId, parsed.code, parsed.discount);
           const coupon = getCouponByCode(parsed.code);
           const userData = localStorage.getItem('user');
           const user = userData ? JSON.parse(userData) : null;
@@ -56,6 +67,22 @@ export default function PaymentPage() {
           localStorage.removeItem(COUPON_STORAGE_KEY);
         }
       }
+
+      const subtotal = cart.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0);
+      const total = Math.max(0, subtotal - discount);
+
+      const order: StoredOrder = {
+        orderId,
+        placedAt: new Date().toISOString(),
+        items: cart,
+        subtotal,
+        discount,
+        total,
+      };
+
+      const orders: StoredOrder[] = JSON.parse(localStorage.getItem(ORDERS_STORAGE_KEY) || '[]');
+      orders.unshift(order);
+      localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
       localStorage.removeItem('tb_cart');
       localStorage.setItem('tb_last_order_id', orderId);
     } finally {
