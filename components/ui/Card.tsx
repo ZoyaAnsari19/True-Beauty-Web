@@ -175,22 +175,24 @@ export function Card(props: CardProps) {
             {service.parlourName}
           </h3>
         </div>
-        <p className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 mb-2">
-          <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-rose-400" />
-          <span className="line-clamp-1">{service.location}</span>
-        </p>
-        <p className="text-sm text-gray-700 font-medium mb-2 line-clamp-2">
-          {service.serviceName}
-        </p>
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <p className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 min-w-0 flex-1">
+            <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-rose-400" />
+            <span className="line-clamp-1">{service.location}</span>
+          </p>
+          <span className="text-xs text-gray-500 uppercase tracking-wide whitespace-nowrap flex-shrink-0">
+            Starting from
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <p className="text-sm text-gray-700 font-medium line-clamp-2 min-w-0 flex-1">
+            {service.serviceName}
+          </p>
+          <span className="text-lg font-bold text-gray-900 whitespace-nowrap flex-shrink-0">
+            ₹{service.startingPrice.toLocaleString('en-IN')}
+          </span>
+        </div>
         <div className="mt-auto flex flex-col gap-3">
-          <div>
-            <span className="block text-xs text-gray-500 uppercase tracking-wide">
-              Starting from
-            </span>
-            <span className="text-lg font-bold text-gray-900">
-              ₹{service.startingPrice.toLocaleString('en-IN')}
-            </span>
-          </div>
           <div className="flex flex-row flex-nowrap items-stretch gap-2 md:gap-3 min-w-0">
             <button
               type="button"
