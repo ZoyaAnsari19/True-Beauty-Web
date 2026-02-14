@@ -49,7 +49,7 @@ export default function Home() {
     phone: '',
     date: '',
     timeSlot: '',
-    paymentMode: 'pay-at-parlour' as 'pay-at-parlour' | 'online',
+    paymentMode: 'online' as 'pay-at-parlour' | 'online',
   });
 
   const allServicesForCategory = useMemo(
@@ -104,7 +104,7 @@ export default function Home() {
       timeSlot,
       name,
       phone,
-      paymentMode: paymentMode === 'pay-at-parlour' ? 'Pay at Parlour' : 'Online Payment',
+      paymentMode: 'Online Payment',
     });
 
     setBookingOpen(false);
@@ -423,17 +423,6 @@ export default function Home() {
                   Payment option
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <label className="flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm cursor-pointer transition-colors duration-200 bg-white border-rose-100 data-[checked=true]:border-rose-500 data-[checked=true]:bg-rose-50">
-                    <input
-                      type="radio"
-                      name="paymentMode"
-                      value="pay-at-parlour"
-                      checked={bookingForm.paymentMode === 'pay-at-parlour'}
-                      onChange={handleBookingInputChange}
-                      className="h-4 w-4 text-rose-500 border-rose-300 focus:ring-rose-400"
-                    />
-                    <span>Pay at Parlour</span>
-                  </label>
                   <label className="flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm cursor-pointer transition-colors duration-200 bg-white border-rose-100 data-[checked=true]:border-rose-500 data-[checked=true]:bg-rose-50">
                     <input
                       type="radio"
