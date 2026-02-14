@@ -6,7 +6,7 @@ import Footer from '../../components/Footer';
 import Link from 'next/link';
 import { ShoppingBag, Trash2, Minus, Plus, ArrowLeft, Tag } from 'lucide-react';
 import { getProductById } from '../../utils/catalog';
-import { validateCoupon, recordCouponUsage, type Coupon, type MinimalCartItem } from '../../utils/coupons';
+import { validateCoupon, getAvailableCouponsForUser, DEFAULT_COUPON_CODE, type Coupon, type MinimalCartItem } from '../../utils/coupons';
 
 type CartItem = { id: number; name: string; price: number; image: string; quantity: number };
 
@@ -25,21 +25,61 @@ export default function CartPage() {
   const [couponMessageType, setCouponMessageType] = useState<'error' | 'success' | null>(null);
 
   useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
+    const cart: CartItem[] = JSON.parse(localStorage.getItem('tb_cart') || '[]');
     setCartItems(cart);
 
-    // Restore previously applied coupon (if still valid)
+    let appliedFromStorage: AppliedCouponState | null = null;
     try {
       const stored = localStorage.getItem(COUPON_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as AppliedCouponState;
         if (parsed?.code) {
+          appliedFromStorage = parsed;
           setAppliedCoupon(parsed);
           setCouponCode(parsed.code);
         }
       }
     } catch {
       // ignore
+    }
+
+    if (!appliedFromStorage && cart.length > 0 && typeof window !== 'undefined') {
+      const profileData = localStorage.getItem('profile');
+      const userData = localStorage.getItem('user');
+      const user =
+        profileData || userData
+          ? {
+              ...(userData ? JSON.parse(userData) : {}),
+              ...(profileData ? JSON.parse(profileData) : {}),
+            }
+          : null;
+      const available = getAvailableCouponsForUser(user);
+      if (available.length > 0) {
+        const preferred = available.find((c) => c.code === DEFAULT_COUPON_CODE) || available[0];
+        setCouponCode(preferred.code);
+        const minimalCart: MinimalCartItem[] = cart.map((item) => ({
+          id: item.id,
+          price: item.price,
+          quantity: item.quantity,
+        }));
+        const result = validateCoupon(
+          preferred.code,
+          minimalCart,
+          (id) => {
+            const p = getProductById(id);
+            if (!p) return null as any;
+            return { id: p.id, category: p.category, price: p.price, originalPrice: p.originalPrice };
+          },
+          user
+        );
+        if (result.ok) {
+          setAppliedCoupon({ code: result.coupon.code, discount: result.discount });
+          localStorage.setItem(
+            COUPON_STORAGE_KEY,
+            JSON.stringify({ code: result.coupon.code, discount: result.discount })
+          );
+        }
+      }
     }
   }, []);
 

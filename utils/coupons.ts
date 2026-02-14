@@ -171,6 +171,19 @@ export function saveCoupons(list: Coupon[]) {
   localStorage.setItem('tb_coupons', JSON.stringify(list));
 }
 
+/**
+ * Returns coupons the user can still use (active, not expired, per-user limit not reached).
+ * Use to prefill coupon input on cart/checkout when user has available coupons.
+ */
+export function getAvailableCouponsForUser(user: unknown): Coupon[] {
+  const all = getStoredCoupons();
+  const today = new Date().toISOString().slice(0, 10);
+  const userId = getUserIdForCouponUsage(user as any);
+  return all.filter(
+    (c) => c.active && c.expiryDate >= today && canUserUseCoupon(c, userId).ok
+  );
+}
+
 export function getCouponByCode(code: string): Coupon | undefined {
   const normalized = code.trim().toUpperCase();
   return getStoredCoupons().find((c) => c.code.toUpperCase() === normalized);
