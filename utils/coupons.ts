@@ -30,7 +30,21 @@ export type CouponUsageSummary = {
 
 export type CouponUsageStore = Record<string, CouponUsageSummary>;
 
+/** Status for coupon history (used on order, expired, or cancelled). */
+export type CouponHistoryStatus = 'used' | 'expired' | 'cancelled';
+
+/** Single entry in coupon history (after use, expiry, or cancel). */
+export type CouponHistoryEntry = {
+  id: string;
+  couponCode: string;
+  discountAmount: number;
+  orderId: string;
+  usedAt: string;
+  status: CouponHistoryStatus;
+};
+
 const USAGE_STORAGE_KEY = 'tb_coupon_usage';
+const COUPON_HISTORY_KEY = 'tb_coupon_history';
 
 // Reusable display/config values for the default coupon used across the app
 export const DEFAULT_COUPON_CODE = 'TRUEPREMIUM200';
@@ -278,5 +292,71 @@ export function isDefaultCouponEligibleProduct(
   product: { price: number; originalPrice: number },
 ): boolean {
   return product.price > DEFAULT_COUPON_PRODUCT_MIN_PRICE;
+}
+
+// --- Coupon History (used / expired / cancelled) ---
+
+export function getCouponHistory(): CouponHistoryEntry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(COUPON_HISTORY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function addToCouponHistory(
+  entry: Omit<CouponHistoryEntry, 'id'>,
+): void {
+  if (typeof window === 'undefined') return;
+  const list = getCouponHistory();
+  const newEntry: CouponHistoryEntry = {
+    ...entry,
+    id: `ch_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+  };
+  list.unshift(newEntry);
+  localStorage.setItem(COUPON_HISTORY_KEY, JSON.stringify(list));
+}
+
+/** Call after successful order: moves applied coupon to history with orderId and status 'used'. */
+export function moveAppliedCouponToHistoryOnOrderSuccess(
+  orderId: string,
+  couponCode: string,
+  discountAmount: number,
+): void {
+  addToCouponHistory({
+    couponCode: couponCode.trim().toUpperCase(),
+    discountAmount,
+    orderId,
+    usedAt: new Date().toISOString(),
+    status: 'used',
+  });
+}
+
+/** Ensures expired stored coupons appear in history (run once on My Coupons page load). */
+export function ensureExpiredCouponsInHistory(): void {
+  if (typeof window === 'undefined') return;
+  const today = new Date().toISOString().slice(0, 10);
+  const stored = getStoredCoupons();
+  const history = getCouponHistory();
+  const codesInHistory = new Set(history.map((h) => h.couponCode.toUpperCase()));
+
+  for (const coupon of stored) {
+    if (coupon.expiryDate >= today) continue;
+    const codeUpper = coupon.code.toUpperCase();
+    if (codesInHistory.has(codeUpper)) continue;
+
+    addToCouponHistory({
+      couponCode: codeUpper,
+      discountAmount: coupon.discountAmount,
+      orderId: '',
+      usedAt: coupon.expiryDate + 'T23:59:59.000Z',
+      status: 'expired',
+    });
+    codesInHistory.add(codeUpper);
+  }
 }
 
