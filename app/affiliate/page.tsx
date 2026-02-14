@@ -304,7 +304,7 @@ export default function AffiliatePage() {
                       </div>
                     )}
 
-                    <button type="submit" disabled={kycStatus !== 'verified' || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > availableBalance} className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg">
+                    <button type="submit" disabled={kycStatus !== 'verified' || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > availableBalance} className="w-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 rounded-lg font-medium hover:opacity-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg">
                       {kycStatus !== 'verified' ? 'KYC Verification Required' : 'Request to withdraw'}
                     </button>
                   </form>
@@ -349,7 +349,7 @@ export default function AffiliatePage() {
                       <input type="text" id="kyc-upi" name="upi" value={kycFormData.upi} onChange={(e) => setKycFormData({ ...kycFormData, upi: e.target.value })} required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="yourname@upi" />
                     </div>
                     <div className="pt-4">
-                      <button type="submit" disabled={isKycSubmitting} className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg">
+                      <button type="submit" disabled={isKycSubmitting} className="w-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 rounded-lg font-medium hover:opacity-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg">
                         {isKycSubmitting ? 'Submitting...' : 'Submit Withdrawal Request'}
                       </button>
                     </div>

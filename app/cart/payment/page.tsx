@@ -116,7 +116,7 @@ export default function PaymentPage() {
             type="button"
             onClick={handlePlaceOrder}
             disabled={isPlacing}
-            className="inline-block bg-rose-500 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-rose-600 disabled:opacity-70 transition-colors mb-4"
+            className="inline-block bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-95 disabled:opacity-70 transition-colors mb-4"
           >
             {isPlacing ? 'Placing order...' : 'Place order'}
           </button>

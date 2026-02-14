@@ -170,7 +170,7 @@ export default function PricingPage() {
                   onClick={() => handleSelectPlan(plan.name)}
                   className={`w-full py-3 px-6 rounded-lg font-medium transition-colors shrink-0 ${
                     plan.popular
-                      ? 'bg-rose-500 hover:bg-rose-600 text-white'
+                      ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
                   }`}
                 >

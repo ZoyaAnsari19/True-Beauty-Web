@@ -194,7 +194,7 @@ export default function SuccessPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/"
-              className="flex items-center justify-center gap-2 bg-rose-500 text-white py-3 px-8 rounded-lg font-medium hover:bg-rose-600 transition-colors"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 px-8 rounded-lg font-medium hover:opacity-95 transition-colors"
             >
               {themePurchased ? 'See Your New Theme' : 'Go to Dashboard'}
               <ArrowRight className="w-5 h-5" />

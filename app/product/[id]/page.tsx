@@ -408,7 +408,7 @@ export default function ProductPage() {
                       className="w-full px-3 py-2 rounded-lg border border-rose-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 resize-y mb-3 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       required
                     />
-                    <button type="submit" disabled={!isVerifiedBuyer || reviewRating === null || !reviewText.trim()} className="inline-flex items-center gap-2 bg-rose-500 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <button type="submit" disabled={!isVerifiedBuyer || reviewRating === null || !reviewText.trim()} className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                       <MessageSquare className="w-4 h-4" /> Submit review
                     </button>
                     {submitted && <p className="mt-2 text-sm text-emerald-600">Thanks! Your review has been added.</p>}
@@ -435,7 +435,7 @@ export default function ProductPage() {
                         title={connectedInstagram ? 'Connected' : 'Connect Instagram'}
                         className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                           connectedInstagram
-                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
                         }`}
                       >
@@ -448,7 +448,7 @@ export default function ProductPage() {
                         title={connectedYouTube ? 'Connected' : 'Connect YouTube'}
                         className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                           connectedYouTube
-                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
                         }`}
                       >
@@ -461,7 +461,7 @@ export default function ProductPage() {
                         title={connectedFacebook ? 'Connected' : 'Connect Facebook'}
                         className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                           connectedFacebook
-                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
                         }`}
                       >
@@ -474,7 +474,7 @@ export default function ProductPage() {
                         title={connectedTwitter ? 'Connected' : 'Connect Twitter'}
                         className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                           connectedTwitter
-                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
                         }`}
                       >
@@ -498,7 +498,7 @@ export default function ProductPage() {
                         <button
                           type="submit"
                           disabled={!canShareSocial || !socialPostUrl.trim() || !getSocialPlatform(socialPostUrl)}
-                          className="px-4 py-2 rounded-lg bg-rose-500 text-white text-sm font-medium hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white text-sm font-medium hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Share
                         </button>

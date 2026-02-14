@@ -249,7 +249,7 @@ export default function DocumentsPage() {
                                 <button
                                   onClick={() => handleFileSelect(doc.id)}
                                   disabled={isUploading && selectedDocumentId === doc.id}
-                                  className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 text-sm sm:text-base"
+                                  className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white rounded-lg hover:opacity-95 transition-colors disabled:opacity-50 text-sm sm:text-base"
                                 >
                                   <Upload className="w-4 h-4 shrink-0" />
                                   {isUploading && selectedDocumentId === doc.id ? 'Uploading...' : 'Upload Document'}
@@ -290,7 +290,7 @@ export default function DocumentsPage() {
             <button
               onClick={handleContinue}
               disabled={!isAllRequiredUploaded()}
-              className="w-full sm:flex-1 bg-rose-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full sm:flex-1 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 px-6 rounded-lg font-medium hover:opacity-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               Proceed to Payment
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

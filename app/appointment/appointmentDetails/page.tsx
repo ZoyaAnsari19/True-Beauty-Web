@@ -91,7 +91,7 @@ export default function AppointmentDetailsPage() {
               </p>
               <Link
                 href="/#products"
-                className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-rose-500 text-white text-sm font-medium hover:bg-rose-600 transition-colors"
+                className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white text-sm font-medium hover:opacity-95 transition-colors"
               >
                 ← Back to services
               </Link>

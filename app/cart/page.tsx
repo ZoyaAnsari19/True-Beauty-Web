@@ -161,7 +161,7 @@ export default function CartPage() {
               <ShoppingBag className="w-20 h-20 text-rose-200 mx-auto mb-4" />
               <h2 className="text-xl font-semibold text-gray-800 mb-2">Your cart is empty</h2>
               <p className="text-gray-600 mb-6">Add some products to get started.</p>
-              <Link href="/" className="inline-block bg-rose-500 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-rose-600 transition-colors">
+              <Link href="/" className="inline-block bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-95 transition-colors">
                 Continue Shopping
               </Link>
             </div>
@@ -245,7 +245,7 @@ export default function CartPage() {
                       <button
                         type="button"
                         onClick={handleApplyCoupon}
-                        className="whitespace-nowrap px-4 py-2 rounded-lg bg-rose-500 text-white text-sm font-medium hover:bg-rose-600 transition-colors"
+                        className="whitespace-nowrap px-4 py-2 rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white text-sm font-medium hover:opacity-95 transition-colors"
                       >
                         Apply
                       </button>
@@ -285,7 +285,7 @@ export default function CartPage() {
 
                 <Link
                   href="/cart/shipping"
-                  className="block w-full bg-rose-500 text-white py-3 rounded-lg font-medium text-center hover:bg-rose-600 transition-colors"
+                  className="block w-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 rounded-lg font-medium text-center hover:opacity-95 transition-colors"
                 >
                   Proceed to Checkout
                 </Link>
