@@ -8,9 +8,10 @@ import Link from 'next/link';
 import { getProductById } from '../../../utils/catalog';
 import {
   DEFAULT_COUPON_CODE,
-  DEFAULT_COUPON_DISCOUNT,
   DEFAULT_COUPON_MIN_CART_TOTAL,
-  isDefaultCouponEligibleProduct,
+  getCouponDisplayState,
+  REWARD_ORDER_MIN_PRICE,
+  REWARD_DISCOUNT_PERCENT,
 } from '../../../utils/coupons';
 import { ArrowLeft, ShoppingBag, Star, Zap, Image as ImageIcon, MessageSquare, CheckCircle, Instagram, Youtube, Facebook, Twitter, Link2 } from 'lucide-react';
 import type { Product } from '../../../utils/catalog';
@@ -119,6 +120,7 @@ export default function ProductPage() {
   const [connectedTwitter, setConnectedTwitter] = useState(false);
   const [sharedSocialPosts, setSharedSocialPosts] = useState<SharedSocialPost[]>([]);
   const [socialPostUrl, setSocialPostUrl] = useState('');
+  const [user, setUser] = useState<Record<string, unknown> | null>(null);
   const product = getProductById(params.id as string);
   const isVerifiedBuyer = isClient && product ? (() => {
     const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
@@ -128,6 +130,18 @@ export default function ProductPage() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (!isClient || typeof window === 'undefined') return;
+    const authToken = localStorage.getItem('authToken');
+    const profileData = localStorage.getItem('profile');
+    const userData = localStorage.getItem('user');
+    setUser(
+      authToken && (profileData || userData)
+        ? { ...(userData ? JSON.parse(userData) : {}), ...(profileData ? JSON.parse(profileData) : {}) }
+        : null
+    );
+  }, [isClient]);
 
   const addToCart = () => {
     if (!product) return;
@@ -207,7 +221,7 @@ export default function ProductPage() {
   }
 
   const discountPercent = Math.round((1 - product.price / product.originalPrice) * 100);
-  const showCouponInfo = isDefaultCouponEligibleProduct(product);
+  const couponState = getCouponDisplayState(product, user, { page: 'detail' });
   const demoVideoSrc = getProductDemoVideo(product);
 
   return (
@@ -255,17 +269,30 @@ export default function ProductPage() {
                     <span className="text-base text-gray-400 line-through font-medium">₹{product.originalPrice.toFixed(2)}</span>
                   )}
                 </div>
-                {showCouponInfo && (
+                {couponState.show && couponState.type === 'has_coupon' && (
                   <div className="mb-6">
                     <p className="text-sm text-emerald-700 font-medium">
-                      Apply coupon {DEFAULT_COUPON_CODE} &amp; get ₹
-                      {DEFAULT_COUPON_DISCOUNT.toLocaleString('en-IN')} OFF (Valid on orders above ₹
+                      Apply coupon {DEFAULT_COUPON_CODE} &amp; get {couponState.discountDisplay} OFF (Valid on orders above ₹
                       {DEFAULT_COUPON_MIN_CART_TOTAL.toLocaleString('en-IN')})
                     </p>
                   </div>
                 )}
+                {couponState.show && couponState.type === 'get_coupon' && (
+                  <div className="mb-6">
+                    <p className="text-sm text-rose-700 font-medium">
+                      {couponState.message}
+                    </p>
+                  </div>
+                )}
+                {product.price >= REWARD_ORDER_MIN_PRICE && (
+                  <div className="mb-6">
+                    <p className="text-sm text-amber-700 font-medium">
+                      Buy this product &amp; earn a {REWARD_DISCOUNT_PERCENT}% OFF reward coupon
+                    </p>
+                  </div>
+                )}
                 <div className="mt-auto flex flex-row gap-3">
-                  <button onClick={() => { addToCart(); router.push('/cart'); }} className="flex-1 bg-rose-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-rose-600 transition-colors flex items-center justify-center gap-2">
+                  <button onClick={() => { addToCart(); router.push('/cart'); }} className="flex-1 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 px-4 rounded-lg font-medium hover:opacity-95 transition-all flex items-center justify-center gap-2">
                     <Zap className="w-5 h-5" /> Buy Now
                   </button>
                   {isInCart() ? (
@@ -408,7 +435,7 @@ export default function ProductPage() {
                       className="w-full px-3 py-2 rounded-lg border border-rose-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 resize-y mb-3 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       required
                     />
-                    <button type="submit" disabled={!isVerifiedBuyer || reviewRating === null || !reviewText.trim()} className="inline-flex items-center gap-2 bg-rose-500 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <button type="submit" disabled={!isVerifiedBuyer || reviewRating === null || !reviewText.trim()} className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                       <MessageSquare className="w-4 h-4" /> Submit review
                     </button>
                     {submitted && <p className="mt-2 text-sm text-emerald-600">Thanks! Your review has been added.</p>}
@@ -435,7 +462,7 @@ export default function ProductPage() {
                         title={connectedInstagram ? 'Connected' : 'Connect Instagram'}
                         className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                           connectedInstagram
-                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
                         }`}
                       >
@@ -448,7 +475,7 @@ export default function ProductPage() {
                         title={connectedYouTube ? 'Connected' : 'Connect YouTube'}
                         className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                           connectedYouTube
-                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
                         }`}
                       >
@@ -461,7 +488,7 @@ export default function ProductPage() {
                         title={connectedFacebook ? 'Connected' : 'Connect Facebook'}
                         className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                           connectedFacebook
-                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
                         }`}
                       >
@@ -474,7 +501,7 @@ export default function ProductPage() {
                         title={connectedTwitter ? 'Connected' : 'Connect Twitter'}
                         className={`inline-flex items-center justify-center w-11 h-11 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                           connectedTwitter
-                            ? 'bg-rose-500 text-white hover:bg-rose-600'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white hover:opacity-95'
                             : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
                         }`}
                       >
@@ -498,7 +525,7 @@ export default function ProductPage() {
                         <button
                           type="submit"
                           disabled={!canShareSocial || !socialPostUrl.trim() || !getSocialPlatform(socialPostUrl)}
-                          className="px-4 py-2 rounded-lg bg-rose-500 text-white text-sm font-medium hover:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white text-sm font-medium hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Share
                         </button>

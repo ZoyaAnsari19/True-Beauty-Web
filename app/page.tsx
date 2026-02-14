@@ -161,7 +161,7 @@ function HomeContent() {
                             </li>
                           ))}
                         </ul>
-                        <button className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-8 py-3 rounded-full font-medium hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300">
+                        <button className="bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white px-8 py-3 rounded-full font-medium hover:shadow-lg hover:opacity-95 transform hover:-translate-y-1 transition-all duration-300">
                           {slide.buttonText}
                         </button>
                       </div>
@@ -210,7 +210,7 @@ function HomeContent() {
                       onClick={() => handleCategoryClick('all')}
                       className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
                         selectedCategory === 'all'
-                          ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
+                          ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white border-transparent shadow-sm'
                           : 'bg-white/80 text-gray-700 border-rose-100 hover:bg-rose-50'
                       }`}
                     >
@@ -223,7 +223,7 @@ function HomeContent() {
                         onClick={() => handleCategoryClick(category.slug)}
                         className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 ${
                           selectedCategory === category.slug
-                            ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
+                            ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white border-transparent shadow-sm'
                             : 'bg-white/80 text-gray-700 border-rose-100 hover:bg-rose-50'
                         }`}
                       >
@@ -289,7 +289,7 @@ function HomeContent() {
                         <div className="mt-6 md:mt-8 flex justify-center">
                           <Link
                             href="/services"
-                            className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
+                            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white px-6 py-2.5 text-sm font-medium hover:opacity-95 transition-all duration-200"
                           >
                             View All Services
                           </Link>
@@ -456,7 +456,7 @@ function HomeContent() {
               </div>
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center rounded-lg bg-rose-500 text-white font-medium text-sm md:text-base py-2.5 md:py-3 hover:bg-rose-600 transition-colors duration-200"
+                className="w-full inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white font-medium text-sm md:text-base py-2.5 md:py-3 hover:opacity-95 transition-all duration-200"
               >
                 Confirm Booking
               </button>

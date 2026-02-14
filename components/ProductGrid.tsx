@@ -8,6 +8,8 @@ import { getCategoryNameBySlug } from '../utils/categories';
 import type { Product } from '../utils/catalog';
 import Card from './ui/Card';
 
+const MOBILE_BREAKPOINT = 768;
+
 type ProductGridProps = {
   /** When provided, filter by category (and optional subcategory). When omitted, show all products or use `products` prop. */
   categorySlug?: string;
@@ -65,16 +67,24 @@ export default function ProductGrid({
     return list;
   }, [productsProp, categoryFromUrl, subcategoryFromUrl]);
 
-  const initialVisible = limit != null && limit > 0 ? limit : allProducts.length;
-  const [visibleCount, setVisibleCount] = useState(initialVisible);
-
+  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
-    setVisibleCount(limit != null && limit > 0 ? limit : allProducts.length);
-  }, [limit, allProducts.length]);
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    const handle = () => setIsMobile(mql.matches);
+    handle();
+    mql.addEventListener('change', handle);
+    return () => mql.removeEventListener('change', handle);
+  }, []);
+
+  /** On mobile show 4 products when limit is set; on desktop use limit as-is. */
+  const effectiveLimit = useMemo(() => {
+    if (limit == null || limit <= 0) return allProducts.length;
+    return isMobile ? Math.min(4, limit) : limit;
+  }, [limit, allProducts.length, isMobile]);
 
   const visibleProducts = useMemo(
-    () => allProducts.slice(0, Math.min(visibleCount, allProducts.length)),
-    [allProducts, visibleCount]
+    () => allProducts.slice(0, Math.min(effectiveLimit, allProducts.length)),
+    [allProducts, effectiveLimit]
   );
 
   useEffect(() => {
@@ -87,8 +97,8 @@ export default function ProductGrid({
   const showSubtitle = subtitle && !categoryFromUrl;
   const showEmptyState = allProducts.length === 0;
 
-  /** Show "View All" only when there are more than 6 products. */
-  const showViewAllSection = allProducts.length > 6;
+  /** On mobile show "View All" when more than 4 products; on desktop when more than 6. */
+  const showViewAllSection = limit != null && limit > 0 && (isMobile ? allProducts.length > 4 : allProducts.length > 6);
 
   return (
     <div className="w-full">
@@ -137,7 +147,7 @@ export default function ProductGrid({
             <div className="mt-5 md:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/products"
-                className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white px-6 py-2.5 text-sm font-medium hover:opacity-95 transition-all duration-200"
               >
                 View All Products
               </Link>

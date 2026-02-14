@@ -277,7 +277,7 @@ export default function PaymentPage() {
                   <button
                     type="submit"
                     disabled={isProcessing}
-                    className="w-full bg-rose-500 text-white py-4 px-6 rounded-lg font-medium hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
+                    className="w-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-4 px-6 rounded-lg font-medium hover:opacity-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
                   >
                     {isProcessing ? (
                       <>

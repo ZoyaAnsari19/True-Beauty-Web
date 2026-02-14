@@ -203,7 +203,7 @@ export default function LoginPage() {
 
                 {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg"><p className="text-sm text-red-600">{error}</p></div>}
 
-                <button type="button" onClick={handleSendOtp} disabled={isLoading || phone.length !== 10} className="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white py-3 rounded-lg font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none flex items-center justify-center gap-2">
+                <button type="button" onClick={handleSendOtp} disabled={isLoading || phone.length !== 10} className="w-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 rounded-lg font-medium hover:opacity-95 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none flex items-center justify-center gap-2">
                   {isLoading ? <><Loader className="w-5 h-5 animate-spin" />Sending OTP...</> : 'Send OTP'}
                 </button>
               </div>
@@ -253,7 +253,7 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                <button type="button" onClick={handleVerifyOtp} disabled={isLoading || otp.length !== 6} className="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white py-3 rounded-lg font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none flex items-center justify-center gap-2">
+                <button type="button" onClick={handleVerifyOtp} disabled={isLoading || otp.length !== 6} className="w-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 rounded-lg font-medium hover:opacity-95 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:transform-none flex items-center justify-center gap-2">
                   {isLoading ? <><Loader className="w-5 h-5 animate-spin" />Verifying...</> : 'Verify OTP'}
                 </button>
             </div>

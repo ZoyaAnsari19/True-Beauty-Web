@@ -9,6 +9,8 @@ import {
   getStoredCoupons,
   getCouponHistory,
   ensureExpiredCouponsInHistory,
+  getUserIdForCouponUsage,
+  canUserUseCoupon,
   type CouponHistoryEntry,
   type CouponHistoryStatus,
 } from '../../../utils/coupons';
@@ -39,16 +41,31 @@ export default function MyCouponsPage() {
   const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
   const [coupons, setCoupons] = useState(() => getStoredCoupons());
   const [history, setHistory] = useState<CouponHistoryEntry[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     ensureExpiredCouponsInHistory();
     setCoupons(getStoredCoupons());
     setHistory(getCouponHistory());
+    if (typeof window !== 'undefined') {
+      const profileData = localStorage.getItem('profile');
+      const userData = localStorage.getItem('user');
+      const user =
+        profileData || userData
+          ? {
+              ...(userData ? JSON.parse(userData) : {}),
+              ...(profileData ? JSON.parse(profileData) : {}),
+            }
+          : null;
+      setUserId(getUserIdForCouponUsage(user));
+    }
   }, [activeTab]);
 
-  const activeCoupons = coupons.filter(
-    (c) => c.active && todayStr() <= c.expiryDate
-  );
+  const activeCoupons = coupons.filter((c) => {
+    if (!c.active || todayStr() > c.expiryDate) return false;
+    const canUse = canUserUseCoupon(c, userId);
+    return canUse.ok;
+  });
 
   const usedEntries = history.filter((h) => h.status === 'used');
   const totalCouponsUsed = usedEntries.length;
@@ -71,7 +88,7 @@ export default function MyCouponsPage() {
           </div>
           <div className="hidden lg:block mb-4">
             <Link
-              href="/profile"
+              href="/"
               className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -106,7 +123,7 @@ export default function MyCouponsPage() {
               </div>
               <div className="rounded-xl border border-rose-100 bg-rose-50/50 p-4">
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Total Savings
+                  Lifetime Savings
                 </p>
                 <p className="text-2xl font-bold text-emerald-600">
                   ₹{totalSavings.toLocaleString('en-IN')}
@@ -172,8 +189,10 @@ export default function MyCouponsPage() {
                             </p>
                           )}
                           <p className="mt-1 text-xs text-gray-600">
-                            Flat ₹{coupon.discountAmount} off on eligible items •
-                            Min cart ₹{coupon.minCartTotal}
+                            {coupon.discountPercent != null
+                              ? `${coupon.discountPercent}% off on your next order`
+                              : `Flat ₹${coupon.discountAmount} off on eligible items`}
+                            {coupon.minCartTotal > 0 && ` • Min cart ₹${coupon.minCartTotal}`}
                           </p>
                           <p className="mt-1 text-xs text-gray-500">
                             Valid from{' '}

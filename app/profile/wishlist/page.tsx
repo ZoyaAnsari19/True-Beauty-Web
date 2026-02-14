@@ -154,7 +154,7 @@ export default function WishlistPage() {
               </div>
               <h2 className="text-2xl font-playfair font-bold text-gray-800 mb-2">Your wishlist is empty</h2>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">Start adding products you love to your wishlist</p>
-              <Link href="/" className="inline-flex items-center gap-2 bg-rose-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-rose-600 transition-colors">
+              <Link href="/" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white px-6 py-3 rounded-lg font-medium hover:opacity-95 transition-colors">
                 <ShoppingBag className="w-5 h-5" />
                 Start Shopping
               </Link>
@@ -215,7 +215,7 @@ export default function WishlistPage() {
                         ) : (
                           <button 
                             onClick={() => addToCart(product)}
-                            className="flex-1 bg-rose-500 text-white py-2 px-3 rounded-lg text-xs font-medium hover:bg-rose-600 transition-colors duration-300 flex items-center justify-center gap-1.5"
+                            className="flex-1 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-2 px-3 rounded-lg text-xs font-medium hover:opacity-95 transition-colors duration-300 flex items-center justify-center gap-1.5"
                           >
                             <ShoppingBag className="w-3.5 h-3.5" />Add to Cart
                           </button>

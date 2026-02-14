@@ -75,7 +75,7 @@ export default function OrdersPage() {
               </p>
               <Link
                 href="/"
-                className="inline-block px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-lg font-medium hover:from-rose-600 hover:to-pink-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                className="inline-block px-6 py-3 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white rounded-lg font-medium hover:opacity-95 transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Start Shopping
               </Link>

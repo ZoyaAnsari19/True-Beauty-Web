@@ -6,8 +6,7 @@ import { MapPin, Eye, Zap, Heart } from 'lucide-react';
 import type { Product, BeautyService } from '../../utils/catalog';
 import {
   DEFAULT_COUPON_CODE,
-  DEFAULT_COUPON_DISCOUNT,
-  isDefaultCouponEligibleProduct,
+  getCouponDisplayState,
 } from '../../utils/coupons';
 
 const cardBaseClass =
@@ -32,6 +31,7 @@ const WISHLIST_KEY = 'tb_wishlist';
 export function Card(props: CardProps) {
   const productId = props.variant === 'product' ? props.item.id : null;
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [couponState, setCouponState] = useState<ReturnType<typeof getCouponDisplayState>>({ show: false });
 
   useEffect(() => {
     if (productId == null || typeof window === 'undefined') return;
@@ -42,6 +42,18 @@ export function Card(props: CardProps) {
       setIsInWishlist(false);
     }
   }, [productId]);
+
+  useEffect(() => {
+    if (props.variant !== 'product' || typeof window === 'undefined') return;
+    const product = props.item as Product;
+    const authToken = localStorage.getItem('authToken');
+    const profileData = localStorage.getItem('profile');
+    const userData = localStorage.getItem('user');
+    const user = authToken && (profileData || userData)
+      ? { ...(userData ? JSON.parse(userData) : {}), ...(profileData ? JSON.parse(profileData) : {}) }
+      : null;
+    setCouponState(getCouponDisplayState(product, user, { page: 'card' }));
+  }, [props.variant, props.item]);
 
   const toggleWishlist = (e: React.MouseEvent, id: number) => {
     e.preventDefault();
@@ -61,7 +73,7 @@ export function Card(props: CardProps) {
 
   if (props.variant === 'product') {
     const { item: product, onBuyNow } = props;
-    const showCouponBadge = isDefaultCouponEligibleProduct(product);
+    const showCouponBadge = couponState.show && couponState.type === 'has_coupon';
 
     return (
       <article className={cardBaseClass}>
@@ -104,11 +116,11 @@ export function Card(props: CardProps) {
                 </span>
               )}
             </div>
-            {showCouponBadge && (
+            {showCouponBadge && couponState.type === 'has_coupon' && (
               <div className="hidden sm:flex flex-col items-end">
                 <div className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold px-2 py-0.5">
-                  <span className="mr-1">🎟</span>₹
-                  {DEFAULT_COUPON_DISCOUNT.toLocaleString('en-IN')} OFF
+                  <span className="mr-1">🎟</span>
+                  {couponState.discountDisplay} OFF
                 </div>
                 <p className="mt-0.5 text-[10px] text-emerald-700">
                   Code: <span className="font-semibold">{DEFAULT_COUPON_CODE}</span>
@@ -120,7 +132,7 @@ export function Card(props: CardProps) {
             <button
               type="button"
               onClick={() => onBuyNow(product)}
-              className="w-full sm:flex-1 min-w-0 h-10 sm:h-11 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-rose-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
+              className="w-full sm:flex-1 min-w-0 h-10 sm:h-11 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:opacity-95 transition-all duration-300 shrink-0 whitespace-nowrap"
             >
               <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
               Buy Now
@@ -183,7 +195,7 @@ export function Card(props: CardProps) {
             <button
               type="button"
               onClick={onBook}
-              className="flex-1 min-w-0 md:min-w-[110px] min-h-[40px] md:min-h-[44px] px-3 sm:px-4 py-2 inline-flex items-center justify-center rounded-lg bg-rose-500 text-white text-xs sm:text-sm font-medium hover:bg-rose-600 transition-colors duration-200 shrink-0 whitespace-nowrap"
+              className="flex-1 min-w-0 md:min-w-[110px] min-h-[40px] md:min-h-[44px] px-3 sm:px-4 py-2 inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white text-xs sm:text-sm font-medium hover:opacity-95 transition-all duration-200 shrink-0 whitespace-nowrap"
             >
               Book Appointment
             </button>

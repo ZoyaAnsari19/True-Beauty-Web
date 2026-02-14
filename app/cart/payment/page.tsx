@@ -11,6 +11,9 @@ import {
   recordCouponUsage,
   getUserIdForCouponUsage,
   getCouponByCode,
+  isRewardCouponCode,
+  markRewardCouponUsed,
+  createRewardCouponAfterOrder,
 } from '../../../utils/coupons';
 
 const COUPON_STORAGE_KEY = 'tb_cart_coupon';
@@ -59,11 +62,15 @@ export default function PaymentPage() {
         if (parsed?.code && typeof parsed.discount === 'number') {
           discount = parsed.discount;
           moveAppliedCouponToHistoryOnOrderSuccess(orderId, parsed.code, parsed.discount);
-          const coupon = getCouponByCode(parsed.code);
-          const userData = localStorage.getItem('user');
-          const user = userData ? JSON.parse(userData) : null;
-          const userId = getUserIdForCouponUsage(user);
-          if (coupon && userId) recordCouponUsage(coupon, userId);
+          if (isRewardCouponCode(parsed.code)) {
+            markRewardCouponUsed(parsed.code);
+          } else {
+            const coupon = getCouponByCode(parsed.code);
+            const userData = localStorage.getItem('user');
+            const user = userData ? JSON.parse(userData) : null;
+            const userId = getUserIdForCouponUsage(user);
+            if (coupon && userId) recordCouponUsage(coupon, userId);
+          }
           localStorage.removeItem(COUPON_STORAGE_KEY);
         }
       }
@@ -80,6 +87,8 @@ export default function PaymentPage() {
         total,
       };
 
+      createRewardCouponAfterOrder(cart);
+
       const orders: StoredOrder[] = JSON.parse(localStorage.getItem(ORDERS_STORAGE_KEY) || '[]');
       orders.unshift(order);
       localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
@@ -87,7 +96,7 @@ export default function PaymentPage() {
       localStorage.setItem('tb_last_order_id', orderId);
     } finally {
       setIsPlacing(false);
-      router.push('/profile/orders');
+      router.push('/cart/order-success');
     }
   };
 
@@ -116,7 +125,7 @@ export default function PaymentPage() {
             type="button"
             onClick={handlePlaceOrder}
             disabled={isPlacing}
-            className="inline-block bg-rose-500 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-rose-600 disabled:opacity-70 transition-colors mb-4"
+            className="inline-block bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-95 disabled:opacity-70 transition-colors mb-4"
           >
             {isPlacing ? 'Placing order...' : 'Place order'}
           </button>

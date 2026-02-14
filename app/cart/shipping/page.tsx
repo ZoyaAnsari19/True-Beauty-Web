@@ -131,7 +131,7 @@ export default function ShippingPage() {
           <Package className="w-16 h-16 text-rose-300 mb-4" />
           <h1 className="text-xl font-semibold text-gray-800 mb-2">Your cart is empty</h1>
           <p className="text-gray-600 mb-6">Add items to your cart to proceed with checkout.</p>
-          <Link href="/" className="bg-rose-500 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-rose-600 transition-colors">Continue Shopping</Link>
+          <Link href="/" className="bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-95 transition-colors">Continue Shopping</Link>
         </div>
       );
     }
@@ -294,7 +294,7 @@ export default function ShippingPage() {
                     <span>₹{total.toFixed(2)}</span>
                   </div>
                 </div>
-                <button type="submit" disabled={isSubmitting} className="w-full mt-6 bg-rose-500 text-white py-3 rounded-lg font-medium hover:bg-rose-600 disabled:opacity-70 disabled:cursor-not-allowed transition-colors">
+                <button type="submit" disabled={isSubmitting} className="w-full mt-6 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 rounded-lg font-medium hover:opacity-95 disabled:opacity-70 disabled:cursor-not-allowed transition-colors">
                   {isSubmitting ? 'Processing...' : 'Continue to Payment'}
                 </button>
               </section>

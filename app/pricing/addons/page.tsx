@@ -183,7 +183,7 @@ export default function AddonsPage() {
                           onClick={() => toggleAddon(addon.id)}
                           className={`ml-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                             addon.selected
-                              ? 'bg-rose-500 border-rose-500'
+                              ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] border-[#FF0066]'
                               : 'border-gray-300 hover:border-rose-500'
                           }`}
                         >
@@ -237,7 +237,7 @@ export default function AddonsPage() {
 
                 <button
                   onClick={handleContinue}
-                  className="w-full bg-rose-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-rose-600 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 px-6 rounded-lg font-medium hover:opacity-95 transition-colors flex items-center justify-center gap-2"
                 >
                   Continue to Documents
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
