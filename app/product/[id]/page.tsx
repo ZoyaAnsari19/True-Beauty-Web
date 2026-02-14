@@ -265,7 +265,7 @@ export default function ProductPage() {
                   </div>
                 )}
                 <div className="mt-auto flex flex-row gap-3">
-                  <button onClick={() => { addToCart(); router.push('/cart'); }} className="flex-1 bg-rose-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-rose-600 transition-colors flex items-center justify-center gap-2">
+                  <button onClick={() => { addToCart(); router.push('/cart'); }} className="flex-1 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white py-3 px-4 rounded-lg font-medium hover:opacity-95 transition-all flex items-center justify-center gap-2">
                     <Zap className="w-5 h-5" /> Buy Now
                   </button>
                   {isInCart() ? (

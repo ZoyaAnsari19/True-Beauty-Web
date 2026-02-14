@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import ThemeSelector from './ThemeSelector';
 import Link from 'next/link';
-import { Search, User, ShoppingBag, Menu, X, Grid3x3, Heart, ChevronRight, ChevronDown, ChevronLeft, MapPin, Package, Wallet, LogOut, Palette, IndianRupee, Users, TicketPercent } from 'lucide-react';
+import { Search, User, ShoppingBag, Menu, X, Grid3x3, Heart, ChevronRight, ChevronDown, ChevronLeft, MapPin, Package, LogOut, Palette, IndianRupee, Users, TicketPercent } from 'lucide-react';
 import { getThemeById } from '../utils/themeUtils';
 import { categories } from '../utils/categories';
 
@@ -194,7 +194,6 @@ export default function Header() {
                           <Link href="/profile/orders" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><Package className="w-5 h-5 flex-shrink-0" /><span>Orders</span></Link>
                           <Link href="/profile/my-coupons" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><TicketPercent className="w-5 h-5 flex-shrink-0" /><span>My Coupons</span></Link>
                           <Link href="/profile/wishlist" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><Heart className="w-5 h-5 flex-shrink-0" /><span>Wishlist</span></Link>
-                          {isAffiliate && <Link href="/affiliate" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"><Wallet className="w-5 h-5 flex-shrink-0" /><span>KYC & Withdraw</span></Link>}
                           <button type="button" onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50"><LogOut className="w-5 h-5 flex-shrink-0" /><span>Logout</span></button>
                         </nav>
                       </div>

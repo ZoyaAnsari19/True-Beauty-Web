@@ -185,7 +185,7 @@ export default function AppointmentDetailsPage() {
                   <button
                     type="button"
                     onClick={() => setBookingOpen(true)}
-                    className="inline-flex items-center justify-center px-4 py-3 rounded-lg bg-rose-500 text-white text-sm md:text-base font-medium hover:bg-rose-600 transition-colors duration-200 shadow-sm"
+                    className="inline-flex items-center justify-center px-4 py-3 rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white text-sm md:text-base font-medium hover:opacity-95 transition-all duration-200 shadow-sm"
                   >
                     Book Appointment
                   </button>
@@ -358,7 +358,7 @@ export default function AppointmentDetailsPage() {
               </div>
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center rounded-lg bg-rose-500 text-white font-medium text-sm md:text-base py-2.5 md:py-3 hover:bg-rose-600 transition-colors duration-200"
+                className="w-full inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white font-medium text-sm md:text-base py-2.5 md:py-3 hover:opacity-95 transition-all duration-200"
               >
                 Confirm Booking
               </button>

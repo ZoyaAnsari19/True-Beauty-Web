@@ -87,10 +87,10 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen md:mt-5 bg-gradient-to-b from-rose-50/30 via-white to-purple-50/30">
       <Header />
-      <main className="pt-8 md:pt-24 pb-16">
+      <main className="pt-24 md:pt-24 pb-16">
         <div className="container mx-auto px-4 md:px-8">
-          <div className="mb-4">
-            <Link href="/" className="inline-flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden">
+          <div className="mb-6 md:mb-4">
+            <Link href="/" className="inline-flex items-center gap-2 p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden">
               <ArrowLeft className="w-5 h-5 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">Back to home</span>
             </Link>
@@ -118,7 +118,7 @@ export default function PricingPage() {
           )}
 
           {/* Hero Section */}
-          <div className={`text-center mb-16 ${themeToPurchase ? 'mt-8' : ''}`}>
+          <div className={`text-center mb-16 ${themeToPurchase ? 'mt-8' : 'mt-6 md:mt-0'}`}>
             <h1 className="text-4xl md:text-5xl font-playfair font-bold text-gray-800 mb-4">
               {themeToPurchase ? 'Complete Your Theme Purchase' : 'Choose Your Perfect Plan'}
             </h1>

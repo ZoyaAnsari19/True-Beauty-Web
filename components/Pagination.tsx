@@ -60,7 +60,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
             href={buildHref(basePath, p)}
             className={`inline-flex items-center justify-center rounded-lg w-9 h-9 text-sm font-medium transition-colors ${
               p === currentPage
-                ? 'bg-rose-500 text-white border border-rose-500'
+                ? 'bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white border border-transparent'
                 : 'border border-rose-200 bg-white/80 text-gray-700 hover:bg-rose-50'
             }`}
             aria-label={`Page ${p}`}

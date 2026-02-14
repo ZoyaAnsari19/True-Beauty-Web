@@ -109,7 +109,7 @@ export default function SuccessPage() {
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 pb-6 mb-6 border-b border-gray-200 md:border-b-0 md:pb-0 md:mb-0">
                 <div className="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <User className="w-6 h-6 text-rose-500" />
                 </div>
@@ -121,7 +121,7 @@ export default function SuccessPage() {
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 pb-6 mb-6 border-b border-gray-200 md:border-b-0 md:pb-0 md:mb-0">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Building className="w-6 h-6 text-blue-500" />
                 </div>
@@ -135,7 +135,7 @@ export default function SuccessPage() {
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 pb-6 mb-6 border-b border-gray-200 md:border-b-0 md:pb-0 md:mb-0">
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Calendar className="w-6 h-6 text-purple-500" />
                 </div>
@@ -152,7 +152,7 @@ export default function SuccessPage() {
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-4 md:border-b-0 md:pb-0 md:mb-0">
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <CheckCircle className="w-6 h-6 text-green-500" />
                 </div>
@@ -202,7 +202,7 @@ export default function SuccessPage() {
             
             {!themePurchased && (
               <Link
-                href="/profile"
+                href="/"
                 className="flex items-center justify-center gap-2 border border-gray-300 text-gray-700 py-3 px-8 rounded-lg font-medium hover:bg-gray-50 transition-colors"
               >
                 Back to Home

@@ -120,7 +120,7 @@ export function Card(props: CardProps) {
             <button
               type="button"
               onClick={() => onBuyNow(product)}
-              className="w-full sm:flex-1 min-w-0 h-10 sm:h-11 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-rose-500 text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:bg-rose-600 transition-colors duration-300 shrink-0 whitespace-nowrap"
+              className="w-full sm:flex-1 min-w-0 h-10 sm:h-11 px-3 md:px-4 inline-flex items-center justify-center gap-1.5 md:gap-2 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white rounded-lg text-xs sm:text-sm md:text-base font-medium hover:opacity-95 transition-all duration-300 shrink-0 whitespace-nowrap"
             >
               <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
               Buy Now
@@ -183,7 +183,7 @@ export function Card(props: CardProps) {
             <button
               type="button"
               onClick={onBook}
-              className="flex-1 min-w-0 md:min-w-[110px] min-h-[40px] md:min-h-[44px] px-3 sm:px-4 py-2 inline-flex items-center justify-center rounded-lg bg-rose-500 text-white text-xs sm:text-sm font-medium hover:bg-rose-600 transition-colors duration-200 shrink-0 whitespace-nowrap"
+              className="flex-1 min-w-0 md:min-w-[110px] min-h-[40px] md:min-h-[44px] px-3 sm:px-4 py-2 inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white text-xs sm:text-sm font-medium hover:opacity-95 transition-all duration-200 shrink-0 whitespace-nowrap"
             >
               Book Appointment
             </button>
