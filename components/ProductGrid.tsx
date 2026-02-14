@@ -87,7 +87,8 @@ export default function ProductGrid({
   const showSubtitle = subtitle && !categoryFromUrl;
   const showEmptyState = allProducts.length === 0;
 
-  const hasMoreToShow = visibleCount < allProducts.length;
+  /** Show "View All" only when there are more than 6 products. */
+  const showViewAllSection = allProducts.length > 6;
 
   return (
     <div className="w-full">
@@ -132,29 +133,14 @@ export default function ProductGrid({
               />
             ))}
           </div>
-          {(hasMoreToShow || (showViewAll && limit != null && limit > 0)) && (
+          {showViewAllSection && showViewAll && limit != null && limit > 0 && (
             <div className="mt-5 md:mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-              {hasMoreToShow && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setVisibleCount((current) =>
-                      Math.min(current + (limit || 4), allProducts.length)
-                    )
-                  }
-                  className="inline-flex items-center justify-center rounded-full border border-rose-300 bg-white/80 text-rose-700 px-6 py-2.5 text-sm font-medium hover:bg-rose-50 transition-colors duration-200"
-                >
-                  Load More
-                </button>
-              )}
-              {showViewAll && limit != null && limit > 0 && (
-                <Link
-                  href="/products"
-                  className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
-                >
-                  View All Products
-                </Link>
-              )}
+              <Link
+                href="/products"
+                className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
+              >
+                View All Products
+              </Link>
             </div>
           )}
         </>

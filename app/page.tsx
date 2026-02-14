@@ -217,7 +217,7 @@ export default function Home() {
                       categorySlug={selectedCategory === 'all' ? undefined : selectedCategory}
                       hideHeader
                       subtitle="Premium beauty picks, tailored to your chosen category."
-                      limit={4}
+                      limit={6}
                       showViewAll
                       columnsLg={3}
                     />
