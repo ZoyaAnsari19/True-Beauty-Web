@@ -1,15 +1,17 @@
 export type Coupon = {
   code: string;
   description?: string;
-  /** Flat discount amount in rupees */
+  /** Flat discount amount in rupees (ignored when discountPercent is set) */
   discountAmount: number;
+  /** Optional percentage off; when set, discount = eligibleTotal * discountPercent / 100 */
+  discountPercent?: number;
   /** Minimum cart total (on eligible items) required */
   minCartTotal: number;
   /** ISO date string (inclusive) */
   startDate: string;
   /** ISO date string (inclusive) */
   expiryDate: string;
-  /** Only these product categories are eligible (by `Product.category`) */
+  /** Only these product categories are eligible (by `Product.category`); ['*'] = all */
   applicableCategories: string[];
   /** If true, products where originalPrice > price are excluded from discount calculations */
   excludeDiscountedProducts: boolean;
@@ -45,6 +47,24 @@ export type CouponHistoryEntry = {
 
 const USAGE_STORAGE_KEY = 'tb_coupon_usage';
 const COUPON_HISTORY_KEY = 'tb_coupon_history';
+const REWARD_COUPONS_KEY = 'tb_reward_coupons';
+const LAST_EARNED_REWARD_KEY = 'tb_last_earned_reward_coupon';
+
+/** Minimum order item price (₹) to earn a reward coupon. */
+export const REWARD_ORDER_MIN_PRICE = 1500;
+/** Reward coupon discount (%). */
+export const REWARD_DISCOUNT_PERCENT = 10;
+/** Reward coupon validity in days. */
+export const REWARD_EXPIRY_DAYS = 30;
+
+export type RewardCoupon = {
+  id: string;
+  code: string;
+  discountPercent: number;
+  expiryDate: string;
+  used: boolean;
+  earnedAt: string;
+};
 
 // Reusable display/config values for the default coupon used across the app
 export const DEFAULT_COUPON_CODE = 'TRUEPREMIUM200';
@@ -95,16 +115,54 @@ export type CouponValidationResult =
   | { ok: true; coupon: Coupon; discount: number; eligibleTotal: number }
   | { ok: false; code: string; errorCode: string; message: string };
 
+export function getRewardCoupons(): RewardCoupon[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(REWARD_COUPONS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveRewardCoupons(list: RewardCoupon[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(REWARD_COUPONS_KEY, JSON.stringify(list));
+}
+
+/** Returns reward coupons that are unused and not expired, as Coupon-like entries for validation. */
+function getActiveRewardCouponsAsCoupons(): Coupon[] {
+  const rewards = getRewardCoupons();
+  const today = new Date().toISOString().slice(0, 10);
+  return rewards
+    .filter((r) => !r.used && r.expiryDate >= today)
+    .map((r) => ({
+      code: r.code,
+      discountAmount: 0,
+      discountPercent: r.discountPercent,
+      minCartTotal: 0,
+      startDate: r.earnedAt.slice(0, 10),
+      expiryDate: r.expiryDate,
+      applicableCategories: ['*'],
+      excludeDiscountedProducts: false,
+      usageLimit: 1,
+      perUserLimit: 1,
+      combinable: false,
+      active: true,
+    }));
+}
+
 export function getStoredCoupons(): Coupon[] {
   if (typeof window === 'undefined') return DEFAULT_COUPONS;
   try {
     const raw = localStorage.getItem('tb_coupons');
-    if (!raw) return DEFAULT_COUPONS;
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return DEFAULT_COUPONS;
-    return parsed;
+    const base = raw ? (Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : DEFAULT_COUPONS) : DEFAULT_COUPONS;
+    const rewardAsCoupons = getActiveRewardCouponsAsCoupons();
+    return [...base, ...rewardAsCoupons];
   } catch {
-    return DEFAULT_COUPONS;
+    return [...DEFAULT_COUPONS, ...getActiveRewardCouponsAsCoupons()];
   }
 }
 
@@ -116,6 +174,73 @@ export function saveCoupons(list: Coupon[]) {
 export function getCouponByCode(code: string): Coupon | undefined {
   const normalized = code.trim().toUpperCase();
   return getStoredCoupons().find((c) => c.code.toUpperCase() === normalized);
+}
+
+export function isRewardCouponCode(code: string): boolean {
+  const c = code.trim().toUpperCase();
+  return c.startsWith('REWARD-');
+}
+
+export function markRewardCouponUsed(code: string): void {
+  const list = getRewardCoupons();
+  const normalized = code.trim().toUpperCase();
+  const updated = list.map((r) => (r.code.toUpperCase() === normalized ? { ...r, used: true } : r));
+  saveRewardCoupons(updated);
+}
+
+/**
+ * If any order item has price >= REWARD_ORDER_MIN_PRICE, creates a 10% OFF reward coupon
+ * (one-time use, 30 days expiry). Saves to tb_reward_coupons and tb_last_earned_reward_coupon for UI.
+ * Returns the earned reward coupon or null.
+ */
+export function createRewardCouponAfterOrder(
+  items: { price: number; quantity?: number }[],
+): RewardCoupon | null {
+  const qualifies = items.some((i) => (i.price ?? 0) >= REWARD_ORDER_MIN_PRICE);
+  if (!qualifies) return null;
+
+  const now = new Date();
+  const expiry = new Date(now.getTime() + REWARD_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  const code = `REWARD-${Date.now().toString(36).toUpperCase().slice(-8)}`;
+  const reward: RewardCoupon = {
+    id: `rc_${Date.now()}`,
+    code,
+    discountPercent: REWARD_DISCOUNT_PERCENT,
+    expiryDate: expiry.toISOString().slice(0, 10),
+    used: false,
+    earnedAt: now.toISOString(),
+  };
+
+  const list = getRewardCoupons();
+  list.unshift(reward);
+  saveRewardCoupons(list);
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(
+      LAST_EARNED_REWARD_KEY,
+      JSON.stringify({ code: reward.code, discountPercent: reward.discountPercent, expiryDate: reward.expiryDate }),
+    );
+  }
+  return reward;
+}
+
+export type LastEarnedReward = { code: string; discountPercent: number; expiryDate: string };
+
+/** Used by order success page to show the just-earned coupon. */
+export function getLastEarnedRewardCoupon(): LastEarnedReward | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(LAST_EARNED_REWARD_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as LastEarnedReward;
+  } catch {
+    return null;
+  }
+}
+
+export function clearLastEarnedRewardCoupon(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(LAST_EARNED_REWARD_KEY);
 }
 
 export function getCouponUsageStore(): CouponUsageStore {
@@ -188,12 +313,14 @@ export function computeEligibleTotal(
   let total = 0;
   let hasEligible = false;
 
+  const allCategories = coupon.applicableCategories.includes('*');
+
   for (const item of cartItems) {
     const product = findProductById(item.id);
     if (!product) continue;
     const qty = item.quantity || 1;
 
-    const isInCategory = coupon.applicableCategories.includes(product.category);
+    const isInCategory = allCategories || coupon.applicableCategories.includes(product.category);
     const isDiscounted = product.originalPrice > product.price;
 
     if (!isInCategory) continue;
@@ -221,6 +348,29 @@ export function validateCoupon(
   const coupon = getCouponByCode(trimmed);
   if (!coupon) {
     return { ok: false, code, errorCode: 'NOT_FOUND', message: 'Coupon code is invalid.' };
+  }
+
+  const normalized = trimmed.toUpperCase();
+  const isReward = isRewardCouponCode(trimmed);
+  if (isReward) {
+    const rewards = getRewardCoupons();
+    const reward = rewards.find((r) => r.code.toUpperCase() === normalized);
+    if (!reward) {
+      return { ok: false, code, errorCode: 'NOT_FOUND', message: 'Coupon code is invalid.' };
+    }
+    if (reward.used) {
+      return { ok: false, code: coupon.code, errorCode: 'USER_LIMIT', message: 'You have already used this coupon.' };
+    }
+    const todayStr = now.toISOString().slice(0, 10);
+    if (todayStr > reward.expiryDate) {
+      return { ok: false, code: coupon.code, errorCode: 'EXPIRED', message: 'This coupon has expired.' };
+    }
+    const { totalEligible, hasEligibleItems } = computeEligibleTotal(cartItems, findProductById, coupon);
+    if (!hasEligibleItems) {
+      return { ok: false, code: coupon.code, errorCode: 'NO_ELIGIBLE_ITEMS', message: 'Add items to cart to use this coupon.' };
+    }
+    const discount = Math.round((totalEligible * (coupon.discountPercent ?? REWARD_DISCOUNT_PERCENT)) / 100);
+    return { ok: true, coupon, discount, eligibleTotal: totalEligible };
   }
 
   if (!coupon.active) {
@@ -261,7 +411,10 @@ export function validateCoupon(
     };
   }
 
-  const discount = Math.min(coupon.discountAmount, totalEligible);
+  const discount =
+    coupon.discountPercent != null
+      ? Math.round((totalEligible * coupon.discountPercent) / 100)
+      : Math.min(coupon.discountAmount, totalEligible);
 
   return {
     ok: true,
@@ -292,6 +445,68 @@ export function isDefaultCouponEligibleProduct(
   product: { price: number; originalPrice: number },
 ): boolean {
   return product.price > DEFAULT_COUPON_PRODUCT_MIN_PRICE;
+}
+
+/** Minimum product price (₹) to show any coupon messaging. Products below this hide all coupon UI. */
+export const COUPON_MESSAGE_MIN_PRICE = DEFAULT_COUPON_PRODUCT_MIN_PRICE;
+
+/**
+ * Returns whether the user is logged in and has an active default coupon (not used yet, valid dates).
+ * Used to decide whether to show "you have coupon" badge or "buy & get coupon" message.
+ */
+export function getUserHasActiveDefaultCoupon(user: unknown): { has: boolean; coupon: Coupon | null } {
+  const coupon = getCouponByCode(DEFAULT_COUPON_CODE);
+  if (!coupon || !coupon.active) return { has: false, coupon: null };
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (todayStr < coupon.startDate || todayStr > coupon.expiryDate) return { has: false, coupon: null };
+
+  const userId = getUserIdForCouponUsage(user as any);
+  if (!userId) return { has: false, coupon: null };
+
+  const canUse = canUserUseCoupon(coupon, userId);
+  if (!canUse.ok) return { has: false, coupon: null };
+
+  return { has: true, coupon };
+}
+
+export type CouponDisplayState =
+  | { show: false }
+  | { show: true; type: 'has_coupon'; discountDisplay: string }
+  | { show: true; type: 'get_coupon'; message: string };
+
+/**
+ * Reusable dynamic coupon display logic for product cards and detail page.
+ * - User must be logged in (pass user from profile); otherwise nothing is shown.
+ * - Product must have price >= COUPON_MESSAGE_MIN_PRICE (₹1000).
+ * - Product must not already be discounted (originalPrice > price).
+ * If user has active coupon: show badge with discount value (₹ or %).
+ * If user does not have active coupon: on detail page only, show "Buy & get ₹200 Coupon".
+ */
+export function getCouponDisplayState(
+  product: { price: number; originalPrice: number },
+  user: unknown,
+  options?: { page: 'card' | 'detail' },
+): CouponDisplayState {
+  if (!user) return { show: false };
+  if (product.price < COUPON_MESSAGE_MIN_PRICE) return { show: false };
+  if (isProductDiscounted(product)) return { show: false };
+
+  const { has, coupon } = getUserHasActiveDefaultCoupon(user);
+  if (has && coupon) {
+    const discountDisplay = `₹${coupon.discountAmount.toLocaleString('en-IN')}`;
+    return { show: true, type: 'has_coupon', discountDisplay };
+  }
+
+  if (options?.page === 'detail') {
+    return {
+      show: true,
+      type: 'get_coupon',
+      message: `Buy this product & get a ₹${DEFAULT_COUPON_DISCOUNT} Coupon`,
+    };
+  }
+
+  return { show: false };
 }
 
 // --- Coupon History (used / expired / cancelled) ---

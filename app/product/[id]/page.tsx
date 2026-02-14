@@ -8,9 +8,10 @@ import Link from 'next/link';
 import { getProductById } from '../../../utils/catalog';
 import {
   DEFAULT_COUPON_CODE,
-  DEFAULT_COUPON_DISCOUNT,
   DEFAULT_COUPON_MIN_CART_TOTAL,
-  isDefaultCouponEligibleProduct,
+  getCouponDisplayState,
+  REWARD_ORDER_MIN_PRICE,
+  REWARD_DISCOUNT_PERCENT,
 } from '../../../utils/coupons';
 import { ArrowLeft, ShoppingBag, Star, Zap, Image as ImageIcon, MessageSquare, CheckCircle, Instagram, Youtube, Facebook, Twitter, Link2 } from 'lucide-react';
 import type { Product } from '../../../utils/catalog';
@@ -119,6 +120,7 @@ export default function ProductPage() {
   const [connectedTwitter, setConnectedTwitter] = useState(false);
   const [sharedSocialPosts, setSharedSocialPosts] = useState<SharedSocialPost[]>([]);
   const [socialPostUrl, setSocialPostUrl] = useState('');
+  const [user, setUser] = useState<Record<string, unknown> | null>(null);
   const product = getProductById(params.id as string);
   const isVerifiedBuyer = isClient && product ? (() => {
     const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
@@ -128,6 +130,18 @@ export default function ProductPage() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (!isClient || typeof window === 'undefined') return;
+    const authToken = localStorage.getItem('authToken');
+    const profileData = localStorage.getItem('profile');
+    const userData = localStorage.getItem('user');
+    setUser(
+      authToken && (profileData || userData)
+        ? { ...(userData ? JSON.parse(userData) : {}), ...(profileData ? JSON.parse(profileData) : {}) }
+        : null
+    );
+  }, [isClient]);
 
   const addToCart = () => {
     if (!product) return;
@@ -207,7 +221,7 @@ export default function ProductPage() {
   }
 
   const discountPercent = Math.round((1 - product.price / product.originalPrice) * 100);
-  const showCouponInfo = isDefaultCouponEligibleProduct(product);
+  const couponState = getCouponDisplayState(product, user, { page: 'detail' });
   const demoVideoSrc = getProductDemoVideo(product);
 
   return (
@@ -255,12 +269,25 @@ export default function ProductPage() {
                     <span className="text-base text-gray-400 line-through font-medium">₹{product.originalPrice.toFixed(2)}</span>
                   )}
                 </div>
-                {showCouponInfo && (
+                {couponState.show && couponState.type === 'has_coupon' && (
                   <div className="mb-6">
                     <p className="text-sm text-emerald-700 font-medium">
-                      Apply coupon {DEFAULT_COUPON_CODE} &amp; get ₹
-                      {DEFAULT_COUPON_DISCOUNT.toLocaleString('en-IN')} OFF (Valid on orders above ₹
+                      Apply coupon {DEFAULT_COUPON_CODE} &amp; get {couponState.discountDisplay} OFF (Valid on orders above ₹
                       {DEFAULT_COUPON_MIN_CART_TOTAL.toLocaleString('en-IN')})
+                    </p>
+                  </div>
+                )}
+                {couponState.show && couponState.type === 'get_coupon' && (
+                  <div className="mb-6">
+                    <p className="text-sm text-rose-700 font-medium">
+                      {couponState.message}
+                    </p>
+                  </div>
+                )}
+                {product.price >= REWARD_ORDER_MIN_PRICE && (
+                  <div className="mb-6">
+                    <p className="text-sm text-amber-700 font-medium">
+                      Buy this product &amp; earn a {REWARD_DISCOUNT_PERCENT}% OFF reward coupon
                     </p>
                   </div>
                 )}
