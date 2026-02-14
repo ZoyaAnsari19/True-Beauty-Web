@@ -5,33 +5,8 @@ import { Heart, ShoppingBag, Star, ArrowLeft, X } from 'lucide-react';
 import Link from 'next/link';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
-
-interface Product {
-  id: number;
-  name: string;
-  image: string;
-  price: number;
-  originalPrice: number;
-  rating: number;
-  highlight: string;
-}
-
-const categories = [
-  { id: 1, name: 'Skincare', subcategories: ['Cleansers', 'Moisturizers', 'Serums', 'Sunscreen'] },
-  { id: 2, name: 'Makeup', subcategories: ['Foundation', 'Lipstick', 'Eyeshadow', 'Mascara'] },
-  { id: 3, name: 'Haircare', subcategories: ['Shampoo', 'Conditioner', 'Hair Oil', 'Styling'] },
-  { id: 4, name: 'Fragrance', subcategories: ['Perfume', 'Body Mist', 'Deodorant'] },
-  { id: 5, name: 'Wellness', subcategories: ['Supplements', 'Tea', 'Vitamins'] }
-];
-
-const products: Product[] = [
-  { id: 1, name: 'Vitamin C Glow Serum', image: '/images/products/serum-1.jpg', price: 1299, originalPrice: 1699, rating: 4.8, highlight: 'Brightening & Antioxidant' },
-  { id: 2, name: 'Hydra-Boost Moisturizer', image: '/images/products/moisturizer-1.jpg', price: 1199, originalPrice: 1499, rating: 4.7, highlight: '24hr Hydration' },
-  { id: 3, name: 'Rose Quartz Roller', image: '/images/products/tool-1.jpg', price: 1499, originalPrice: 1899, rating: 4.9, highlight: 'Facial Massager' },
-  { id: 4, name: 'Lip Plumping Gloss', image: '/images/products/lip-1.jpg', price: 999, originalPrice: 1299, rating: 4.6, highlight: 'Hydrating & Shiny' },
-  { id: 5, name: 'Charcoal Face Mask', image: '/images/products/mask-1.jpg', price: 999, originalPrice: 1399, rating: 4.5, highlight: 'Deep Cleansing' },
-  { id: 6, name: 'Mineral Foundation', image: '/images/products/foundation-1.jpg', price: 1499, originalPrice: 1899, rating: 4.8, highlight: 'Lightweight Coverage' }
-];
+import { products as catalogProducts } from '../../../utils/catalog';
+import type { Product } from '../../../utils/catalog';
 
 export default function WishlistPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,17 +14,12 @@ export default function WishlistPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isAffiliate, setIsAffiliate] = useState(false);
-  const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(80);
-  const [activeCategory, setActiveCategory] = useState<number | null>(categories[0]?.id || null);
-  const [mobileOpenCategory, setMobileOpenCategory] = useState<number | null>(null);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [isClient, setIsClient] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,19 +29,6 @@ export default function WishlistPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const updateHeaderHeight = () => {
-      const header = document.querySelector('header');
-      if (header) setHeaderHeight(header.offsetHeight);
-    };
-    updateHeaderHeight();
-    window.addEventListener('resize', updateHeaderHeight);
-    window.addEventListener('scroll', updateHeaderHeight);
-    return () => {
-      window.removeEventListener('resize', updateHeaderHeight);
-      window.removeEventListener('scroll', updateHeaderHeight);
-    };
-  }, []);
 
   useEffect(() => {
     const authToken = localStorage.getItem('authToken');
@@ -85,18 +42,6 @@ export default function WishlistPage() {
       setIsAffiliate(!!localStorage.getItem('isAffiliate') || !!parsedProfile?.isAffiliate);
     }
   }, []);
-
-  useEffect(() => {
-    if (categoriesMenuOpen && categories.length > 0) setActiveCategory(categories[0].id);
-  }, [categoriesMenuOpen]);
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => { 
-      if (e.key === 'Escape' && categoriesMenuOpen) setCategoriesMenuOpen(false); 
-    };
-    if (categoriesMenuOpen) document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [categoriesMenuOpen]);
 
   useEffect(() => {
     const cartCount = getCartCount();
@@ -117,18 +62,25 @@ export default function WishlistPage() {
   const getWishlist = (): Product[] => {
     if (typeof window === 'undefined') return [];
     try {
-      const wishlist = JSON.parse(localStorage.getItem('tb_wishlist') || '[]');
-      return wishlist.map((id: number) => products.find(p => p.id === id)).filter(Boolean);
+      const ids = JSON.parse(localStorage.getItem('tb_wishlist') || '[]') as number[];
+      return ids
+        .map((id) => catalogProducts.find((p) => p.id === id))
+        .filter((p): p is Product => p != null);
     } catch { return []; }
   };
 
   const removeFromWishlist = (productId: number) => {
     if (typeof window === 'undefined') return;
     try {
-      const wishlist = JSON.parse(localStorage.getItem('tb_wishlist') || '[]');
-      const updatedWishlist = wishlist.filter((id: number) => id !== productId);
-      localStorage.setItem('tb_wishlist', JSON.stringify(updatedWishlist));
-      setWishlist(wishlist.map((id: number) => products.find(p => p.id === id)).filter(Boolean));
+      const ids = (JSON.parse(localStorage.getItem('tb_wishlist') || '[]') as number[]).filter(
+        (id) => id !== productId
+      );
+      localStorage.setItem('tb_wishlist', JSON.stringify(ids));
+      setWishlist(
+        ids
+          .map((id) => catalogProducts.find((p) => p.id === id))
+          .filter((p): p is Product => p != null)
+      );
     } catch { }
   };
 
@@ -136,30 +88,33 @@ export default function WishlistPage() {
     if (!isClient) return false;
     try {
       const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
-      return cart.some((item: { productId: number }) => item.productId === productId);
-    } catch { 
-      return false; 
+      return cart.some((item: { id: number }) => item.id === productId);
+    } catch {
+      return false;
     }
   };
 
   const addToCart = (product: Product) => {
     if (typeof window === 'undefined') return;
     try {
-      const cart = JSON.parse(localStorage.getItem('tb_cart') || '[]');
-      const existingItem = cart.find((item: { productId: number }) => item.productId === product.id);
-      if (existingItem) {
-        existingItem.quantity = (existingItem.quantity || 1) + 1;
+      const cart: { id: number; name: string; price: number; image: string; quantity: number }[] =
+        JSON.parse(localStorage.getItem('tb_cart') || '[]');
+      const existing = cart.find((item) => item.id === product.id);
+      if (existing) {
+        existing.quantity = (existing.quantity || 1) + 1;
       } else {
-        cart.push({ productId: product.id, quantity: 1 });
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: 1,
+        });
       }
       localStorage.setItem('tb_cart', JSON.stringify(cart));
       setCartCount(getCartCount());
     } catch { }
   };
-
-  const activeCategoryData = categories.find(c => c.id === activeCategory) || categories[0];
-  const displayName = user?.name || user?.email || `+91 ${user?.phone || ''}`;
-  const displayInitials = user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : user?.email?.[0].toUpperCase() || 'U';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50/30 via-white to-purple-50/30">

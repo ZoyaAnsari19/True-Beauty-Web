@@ -1,7 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { MapPin, Eye, Zap } from 'lucide-react';
+import { MapPin, Eye, Zap, Heart } from 'lucide-react';
 import type { Product, BeautyService } from '../../utils/catalog';
 import {
   DEFAULT_COUPON_CODE,
@@ -26,7 +27,38 @@ type ServiceCardProps = {
 
 export type CardProps = ProductCardProps | ServiceCardProps;
 
+const WISHLIST_KEY = 'tb_wishlist';
+
 export function Card(props: CardProps) {
+  const productId = props.variant === 'product' ? props.item.id : null;
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  useEffect(() => {
+    if (productId == null || typeof window === 'undefined') return;
+    try {
+      const list = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]') as number[];
+      setIsInWishlist(list.includes(productId));
+    } catch {
+      setIsInWishlist(false);
+    }
+  }, [productId]);
+
+  const toggleWishlist = (e: React.MouseEvent, id: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof window === 'undefined') return;
+    try {
+      const list = (JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]') as number[]).filter(
+        (x) => x !== id
+      );
+      if (!isInWishlist) list.push(id);
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+      setIsInWishlist(!isInWishlist);
+    } catch {
+      // ignore
+    }
+  };
+
   if (props.variant === 'product') {
     const { item: product, onBuyNow } = props;
     const showCouponBadge = isDefaultCouponEligibleProduct(product);
@@ -42,6 +74,20 @@ export function Card(props: CardProps) {
             alt={product.name}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
           />
+          <button
+            type="button"
+            onClick={(e) => toggleWishlist(e, product.id)}
+            aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+            className={`absolute top-3 right-3 z-10 p-2 rounded-full bg-white/90 shadow-md border border-rose-100 transition-opacity duration-200 hover:bg-rose-50 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-rose-400 ${
+              isInWishlist ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            }`}
+          >
+            <Heart
+              className={`w-5 h-5 transition-colors ${
+                isInWishlist ? 'fill-rose-500 text-rose-500' : 'text-gray-500 hover:text-rose-500'
+              }`}
+            />
+          </button>
         </Link>
         <div className="flex flex-col flex-1 p-3 sm:p-4 min-h-0 min-w-0 overflow-hidden">
           <h3 className="font-playfair font-semibold text-gray-800 text-sm sm:text-base md:text-lg leading-snug line-clamp-2">
