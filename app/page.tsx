@@ -52,10 +52,15 @@ export default function Home() {
     paymentMode: 'pay-at-parlour' as 'pay-at-parlour' | 'online',
   });
 
-  const servicesForCategory = useMemo(
-    () => getServicesByCategory(selectedCategory).slice(0, 6),
+  const allServicesForCategory = useMemo(
+    () => getServicesByCategory(selectedCategory),
     [selectedCategory]
   );
+  const servicesForCategory = useMemo(
+    () => allServicesForCategory.slice(0, 6),
+    [allServicesForCategory]
+  );
+  const showViewAllServices = allServicesForCategory.length > 6;
 
   const selectedCategoryLabel =
     selectedCategory === 'all' ? 'All Categories' : getCategoryNameBySlug(selectedCategory);
@@ -262,14 +267,16 @@ export default function Home() {
                           </div>
                         ))}
                       </div>
-                      <div className="mt-6 md:mt-8 flex justify-center">
-                        <Link
-                          href="/services"
-                          className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
-                        >
-                          View All Services
-                        </Link>
-                      </div>
+                      {showViewAllServices && (
+                        <div className="mt-6 md:mt-8 flex justify-center">
+                          <Link
+                            href="/services"
+                            className="inline-flex items-center justify-center rounded-full bg-rose-500 text-white px-6 py-2.5 text-sm font-medium hover:bg-rose-600 transition-colors duration-200"
+                          >
+                            View All Services
+                          </Link>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
