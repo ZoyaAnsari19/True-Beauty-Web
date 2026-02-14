@@ -39,7 +39,15 @@ function ProductsFallback() {
   );
 }
 
-export default function Home() {
+function PageFallback() {
+  return (
+    <div className="min-h-screen gradient-bg flex items-center justify-center">
+      <p className="text-gray-500 text-sm">Loading...</p>
+    </div>
+  );
+}
+
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -496,5 +504,13 @@ export default function Home() {
         </svg>
       </a>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<PageFallback />}>
+      <HomeContent />
+    </Suspense>
   );
 }
