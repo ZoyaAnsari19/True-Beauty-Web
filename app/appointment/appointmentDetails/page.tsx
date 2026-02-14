@@ -145,41 +145,26 @@ export default function AppointmentDetailsPage() {
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  <p className="flex items-start gap-2 text-sm text-gray-600">
-                    <MapPin className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
-                    <span>
-                      <span className="font-medium">{service.location}</span>
-                      <br />
-                      <span className="text-gray-500">{service.address}</span>
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-2 text-sm text-gray-600">
-                    <Phone className="w-4 h-4 text-rose-400 flex-shrink-0" />
-                    <a href={`tel:${service.phone}`} className="hover:text-rose-500">
-                      {service.phone}
-                    </a>
-                  </p>
-                  <p className="flex items-center gap-2 text-sm text-gray-600">
-                    <Clock className="w-4 h-4 text-rose-400 flex-shrink-0" />
-                    <span>{service.workingHours}</span>
-                  </p>
-                </div>
-
                 <div className="mb-6">
                   <h2 className="text-sm font-semibold text-gray-800 mb-2 uppercase tracking-wide">
                     Services Offered
                   </h2>
                   {service.servicesOffered && service.servicesOffered.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {service.servicesOffered.map((item) => (
-                        <span
-                          key={item}
-                          className="inline-flex items-center px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-medium border border-rose-100"
-                        >
-                          {item}
-                        </span>
-                      ))}
+                    <div className="space-y-3">
+                      {service.servicesOffered.map((name, i) => {
+                        const description =
+                          service.serviceDescriptions?.[i] ??
+                          'Professional service offered at our parlour.';
+                        return (
+                          <div
+                            key={name}
+                            className="rounded-lg border border-rose-100 bg-rose-50/50 px-3 py-2.5"
+                          >
+                            <p className="font-medium text-gray-800 text-sm">{name}</p>
+                            <p className="text-xs text-gray-600 mt-0.5">{description}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500">
@@ -205,10 +190,63 @@ export default function AppointmentDetailsPage() {
                     Book Appointment
                   </button>
                   <p className="text-xs text-gray-500">
-                    No online payment required to confirm your slot. Pay safely at the parlour
-                    or choose online payment during booking.
+                    No payment required to confirm your slot. Choose online payment during
+                    booking.
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Location, contact & video card */}
+          <div className="mt-6 md:mt-8 bg-white/95 rounded-2xl border border-rose-100 shadow-sm overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 p-6 md:p-8">
+              <div>
+                <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-4">
+                  Location & Contact
+                </h2>
+                <div className="space-y-3">
+                  <p className="flex items-start gap-2 text-sm text-gray-600">
+                    <MapPin className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
+                    <span>
+                      <span className="font-medium text-gray-800">{service.location}</span>
+                      <br />
+                      <span className="text-gray-500">{service.address}</span>
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-2 text-sm text-gray-600">
+                    <Phone className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                    <a href={`tel:${service.phone}`} className="hover:text-rose-500 font-medium">
+                      {service.phone}
+                    </a>
+                  </p>
+                  <p className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                    <span>{service.workingHours}</span>
+                  </p>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-lg font-playfair font-semibold text-gray-800 mb-4">
+                  Parlour Preview
+                </h2>
+                {service.videoUrl ? (
+                  <div className="aspect-video rounded-xl overflow-hidden bg-gray-100">
+                    <video
+                      src={service.videoUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover"
+                      title="Parlour preview"
+                    />
+                  </div>
+                ) : (
+                  <div className="aspect-video rounded-xl overflow-hidden bg-rose-50/60 flex items-center justify-center border border-rose-100">
+                    <p className="text-sm text-gray-500">Video preview not available</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
