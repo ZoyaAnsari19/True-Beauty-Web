@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Loader, User, Phone, Mail } from 'lucide-react';
@@ -22,7 +23,7 @@ function getPhoneFromClient(): { phone: string; invalidAccess: boolean } {
   return { phone: resolvedPhone, invalidAccess: false };
 }
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [phone, setPhone] = useState('');
@@ -197,3 +198,6 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+const RegisterPage = dynamic(() => Promise.resolve(RegisterPageContent), { ssr: false });
+export default RegisterPage;
