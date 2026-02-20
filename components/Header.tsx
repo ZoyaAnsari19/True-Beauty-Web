@@ -153,13 +153,13 @@ export default function Header() {
   return (
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b-2 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-2 md:py-3 border-rose-200' : 'bg-white/80 py-2.5 sm:py-3 md:py-4 lg:py-5 border-rose-200'}`}>
-        <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8">
+        <div className="w-full pl-8 pr-8 md:pl-16 md:pr-16">
           <div className="flex items-center justify-between gap-1 sm:gap-2 md:gap-3 lg:gap-4">
             <Link href="/" className="flex items-center gap-0 flex-shrink-0 min-w-0 max-w-[200px] sm:max-w-[250px] md:max-w-[300px]">
               <img src="/images/logo/trueBeauty-Logo.png" alt="True Beauty Logo" width={120} height={36} className="object-contain w-[90px] h-[28px] sm:w-[110px] sm:h-[34px] md:w-[130px] md:h-[40px] lg:w-[140px] lg:h-[42px] -mr-2 sm:-mr-3" />
               <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-playfair font-bold text-gray-800 -ml-2 sm:-ml-3">True Beauty</span>
             </Link>
-            <nav className="hidden md:flex items-center space-x-3 lg:space-x-6 xl:space-x-8 flex-1 justify-center max-w-2xl mx-2 lg:mx-4 min-w-0">
+            <nav className="hidden md:flex items-center space-x-3 lg:space-x-6 xl:space-x-8 flex-1 justify-start max-w-2xl mx-2 lg:mx-4 min-w-0">
               <div className="relative w-full max-w-md">
                 <input type="text" placeholder="Search..." className="w-full px-4 lg:px-5 py-2 lg:py-2.5 pl-10 lg:pl-11 rounded-full border-2 border-gray-200 focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition-all bg-white shadow-sm text-sm lg:text-base" />
                 <Search className="absolute left-3 lg:left-4 top-2.5 lg:top-3 text-gray-400 w-4 h-4 lg:w-5 lg:h-5" />

@@ -64,6 +64,12 @@ const CATEGORY_VIDEOS: Record<string, Record<number, string>> = {
     17: '/productsVideo/body&bath/BodyScrub.mp4',
     18: '/productsVideo/body&bath/soapBar.mp4',
   },
+  offers: {
+    33: '/productsVideo/offers/FlashSale-SkincareDuo.mp4',
+    34: '/productsVideo/offers/Lip&Cheek.mp4',
+    35: '/productsVideo/offers/Wellness-Offers.mp4',
+    37: '/productsVideo/offers/ComboOffers.mp4',
+  },
 };
 
 const SKINCARE_DEFAULT_VIDEO = '/productsVideo/skincare/dayCream.mp4';
@@ -74,6 +80,7 @@ const HAIRCARE_DEFAULT_VIDEO = '/productsVideo/haircare/HairShampoo.mp4';
 const GIFTING_DEFAULT_VIDEO = '/productsVideo/gifting/Skincare Gift Set.mp4';
 const FRAGRANCE_DEFAULT_VIDEO = '/productsVideo/fragrance/Perfume.mp4';
 const BATH_BODY_DEFAULT_VIDEO = '/productsVideo/body&bath/bodyWash.mp4';
+const OFFERS_DEFAULT_VIDEO = '/productsVideo/offers/ComboOffers.mp4';
 
 function getProductDemoVideo(product: Product): string | null {
   const byCategory = CATEGORY_VIDEOS[product.category];
@@ -88,6 +95,7 @@ function getProductDemoVideo(product: Product): string | null {
   if (product.category === 'gifting') return GIFTING_DEFAULT_VIDEO;
   if (product.category === 'fragrance') return FRAGRANCE_DEFAULT_VIDEO;
   if (product.category === 'bath-body') return BATH_BODY_DEFAULT_VIDEO;
+  if (product.category === 'offers') return OFFERS_DEFAULT_VIDEO;
 
   return null;
 }
