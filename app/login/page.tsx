@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { Suspense, useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader, Phone } from 'lucide-react';
 
@@ -103,7 +103,7 @@ function getRedirectPath(redirect: string | null): string | null {
   return path;
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = getRedirectPath(searchParams.get('redirect'));
@@ -299,5 +299,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen gradient-bg flex items-center justify-center px-4 py-10">
+        <div className="animate-pulse text-gray-500">Loading...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

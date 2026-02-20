@@ -1,32 +1,46 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Loader, User, Phone, Mail } from 'lucide-react';
 
 const REGISTER_PHONE_EXPIRY_MS = 10 * 60 * 1000; // 10 min
 
+function getPhoneFromClient(): { phone: string; invalidAccess: boolean } {
+  if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') {
+    return { phone: '', invalidAccess: true };
+  }
+  const params = new URLSearchParams(window.location.search);
+  const fromQuery = params.get('phone') ?? '';
+  const fromSession = sessionStorage.getItem('register_phone') ?? '';
+  const verifiedAt = sessionStorage.getItem('register_verified_at');
+  const resolvedPhone = (fromQuery || fromSession || '').replace(/\D/g, '').slice(0, 10);
+  if (!resolvedPhone) return { phone: '', invalidAccess: true };
+  if (verifiedAt) {
+    const parsed = parseInt(verifiedAt, 10);
+    if (!Number.isNaN(parsed) && Date.now() - parsed > REGISTER_PHONE_EXPIRY_MS) {
+      return { phone: resolvedPhone, invalidAccess: true };
+    }
+  }
+  return { phone: resolvedPhone, invalidAccess: false };
+}
+
 export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [mounted, setMounted] = useState(false);
   const [phone, setPhone] = useState('');
   const [formData, setFormData] = useState({ fullName: '', email: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [invalidAccess, setInvalidAccess] = useState(false);
+  const [invalidAccess, setInvalidAccess] = useState(true);
 
   useEffect(() => {
-    const fromQuery = searchParams.get('phone') || '';
-    const fromSession = typeof window !== 'undefined' ? sessionStorage.getItem('register_phone') : null;
-    const verifiedAt = typeof window !== 'undefined' ? sessionStorage.getItem('register_verified_at') : null;
-    const resolvedPhone = fromQuery || fromSession || '';
-    setPhone(resolvedPhone.replace(/\D/g, '').slice(0, 10));
-    if (resolvedPhone && verifiedAt) {
-      const elapsed = Date.now() - parseInt(verifiedAt, 10);
-      if (elapsed > REGISTER_PHONE_EXPIRY_MS) setInvalidAccess(true);
-    } else if (!resolvedPhone) setInvalidAccess(true);
-  }, [searchParams]);
+    const { phone: p, invalidAccess: inv } = getPhoneFromClient();
+    setPhone(p);
+    setInvalidAccess(inv);
+    setMounted(true);
+  }, []);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -41,6 +55,10 @@ export default function RegisterPage() {
     if (!validate() || !phone || phone.length !== 10) return;
     setIsSubmitting(true);
     await new Promise((r) => setTimeout(r, 800));
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      setIsSubmitting(false);
+      return;
+    }
     const userId = `user_${Date.now()}`;
     const userPayload = {
       id: userId,
@@ -70,6 +88,14 @@ export default function RegisterPage() {
     setIsSubmitting(false);
     router.push('/profile');
   };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen gradient-bg flex items-center justify-center px-4 py-10">
+        <div className="animate-pulse text-gray-500">Loading...</div>
+      </div>
+    );
+  }
 
   if (invalidAccess) {
     return (
