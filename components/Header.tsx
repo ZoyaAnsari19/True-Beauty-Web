@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import ThemeSelector from './ThemeSelector';
 import Link from 'next/link';
 import { Search, User, ShoppingBag, Menu, X, Grid3x3, Heart, ChevronRight, ChevronDown, ChevronLeft, MapPin, Package, LogOut, Palette, IndianRupee, Users, TicketPercent } from 'lucide-react';
@@ -10,6 +10,7 @@ import { categories } from '../utils/categories';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -56,6 +57,9 @@ export default function Header() {
       const parsedProfile = profileData ? JSON.parse(profileData) : null;
       setUser({ ...parsedUser, ...parsedProfile });
       setIsAffiliate(!!localStorage.getItem('isAffiliate') || !!parsedProfile?.isAffiliate);
+    } else {
+      setUser(null);
+      setIsAffiliate(false);
     }
 
     // Function to update theme name
@@ -93,7 +97,7 @@ export default function Header() {
       window.removeEventListener('themeChanged', handleThemeChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (categoriesMenuOpen && categories.length > 0) setActiveCategory(categories[0].id);
