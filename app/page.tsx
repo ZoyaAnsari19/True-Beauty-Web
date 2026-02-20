@@ -131,21 +131,19 @@ function HomeContent() {
   return (
     <div className="min-h-screen gradient-bg">
       <Header />
-      <main className="pt-24 pb-0 md:pt-32">
-        <section className="pb-16 md:pb-24 border-b border-rose-200/60">
-          <div className="container mx-auto px-4 md:px-8">
-            <Swiper
-              modules={[Autoplay, Pagination, Navigation]}
-              autoplay={{ delay: 5000, disableOnInteraction: false }}
-              pagination={{ clickable: true }}
-              navigation={true}
-              loop={true}
-              className="rounded-3xl overflow-hidden pastel-shadow border border-rose-200/60"
-            >
-              {heroSlides.map((slide) => (
-                <SwiperSlide key={slide.id}>
-                  <div
-                    className={`min-h[500px] md:min-h-[600px] bg-gradient-to-r ${slide.bgColor} flex flex-col md:flex-row`}
+      <main className="pb-0">
+        <section className="w-full min-h-screen border-b border-rose-200/60">
+          <Swiper
+            modules={[Autoplay, Pagination]}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            pagination={{ clickable: true }}
+            loop={true}
+            className="!w-full h-screen overflow-hidden"
+          >
+            {heroSlides.map((slide) => (
+              <SwiperSlide key={slide.id}>
+<div
+                    className={`h-full min-h-screen bg-gradient-to-r ${slide.bgColor} flex flex-col md:flex-row pt-20 sm:pt-24 md:pt-28`}
                   >
                     <div className="flex-1 flex items-center p-8 md:p-16 animate-slide-in-left">
                       <div className="max-w-lg">
@@ -176,8 +174,7 @@ function HomeContent() {
                   </div>
                 </SwiperSlide>
               ))}
-            </Swiper>
-          </div>
+          </Swiper>
         </section>
 
         <section
