@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { DollarSign, Package, Users, Wallet, Copy, Check, AlertCircle, Calendar, Filter, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Header from '../../components/Header';
@@ -10,12 +11,12 @@ type ActiveSection = 'products' | 'users' | 'withdraw' | null;
 type WithdrawalStatus = 'pending' | 'paid' | 'rejected';
 
 const dummyProducts = [
-  { id: 1, name: 'True Beauty Day Cream', image: '/images/products/dayCream.png', price: 1299, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/day-cream?ref=ABC123' },
-  { id: 2, name: 'True Beauty Night Cream', image: '/images/products/nightCream.png', price: 1399, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/night-cream?ref=ABC123' },
-  { id: 3, name: 'True Beauty Serum', image: '/images/products/serum.png', price: 1499, commission: 20, affiliateLink: 'https://truebeauty.com/affiliate/serum?ref=ABC123' },
-  { id: 4, name: 'True Beauty Sunscreen', image: '/images/products/sunscreen.png', price: 1199, commission: 12, affiliateLink: 'https://truebeauty.com/affiliate/sunscreen?ref=ABC123' },
-  { id: 5, name: 'True Beauty Face Wash', image: '/images/products/faceWash.png', price: 999, commission: 10, affiliateLink: 'https://truebeauty.com/affiliate/face-wash?ref=ABC123' },
-  { id: 6, name: 'True Beauty Moisturizer', image: '/images/products/moisturizer.png', price: 1399, commission: 15, affiliateLink: 'https://truebeauty.com/affiliate/moisturizer?ref=ABC123' }
+  { id: 1, name: 'True Beauty Day Cream', image: '/images/products/dayCream.png', price: 1299, commission: 15 },
+  { id: 2, name: 'True Beauty Night Cream', image: '/images/products/nightCream.png', price: 1399, commission: 15 },
+  { id: 3, name: 'True Beauty Serum', image: '/images/products/serum.png', price: 1499, commission: 20 },
+  { id: 4, name: 'True Beauty Sunscreen', image: '/images/products/sunscreen.png', price: 1199, commission: 12 },
+  { id: 5, name: 'True Beauty Face Wash', image: '/images/products/faceWash.png', price: 999, commission: 10 },
+  { id: 6, name: 'True Beauty Moisturizer', image: '/images/products/moisturizer.png', price: 1399, commission: 15 }
 ];
 
 const dummyUsers = [
@@ -56,6 +57,9 @@ const formatDate = (dateString: string): string => {
 };
 
 export default function AffiliatePage() {
+  const router = useRouter();
+  const [referralCode, setReferralCode] = useState<string>('');
+  const [authChecked, setAuthChecked] = useState(false);
   const [activeSection, setActiveSection] = useState<ActiveSection>(null);
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [showKYC, setShowKYC] = useState(false);
@@ -69,22 +73,34 @@ export default function AffiliatePage() {
   const [isMobileProducts, setIsMobileProducts] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('isAffiliate', 'true');
+    if (typeof window === 'undefined') return;
+    const authToken = localStorage.getItem('authToken');
     const profileData = localStorage.getItem('profile');
-    if (profileData) {
-      const profile = JSON.parse(profileData);
-      profile.isAffiliate = true;
-      localStorage.setItem('profile', JSON.stringify(profile));
+    if (!authToken) {
+      router.replace('/login?redirect=' + encodeURIComponent('/affiliate/apply'));
+      setAuthChecked(true);
+      return;
     }
-  }, []);
+    const profile = profileData ? JSON.parse(profileData) : {};
+    if (!profile.isAffiliate || profile.affiliateStatus !== 'Active') {
+      router.replace('/affiliate/apply');
+      setAuthChecked(true);
+      return;
+    }
+    localStorage.setItem('isAffiliate', 'true');
+    setReferralCode(profile.referralCode || '');
+    setKycStatus(profile.kycStatus || 'not-submitted');
+    setAuthChecked(true);
+  }, [router]);
 
   useEffect(() => {
+    if (!authChecked) return;
     const profileData = localStorage.getItem('profile');
     if (profileData) {
       const profile = JSON.parse(profileData);
       setKycStatus(profile.kycStatus || 'not-submitted');
     }
-  }, []);
+  }, [authChecked]);
 
   useEffect(() => {
     const mql = window.matchMedia('(max-width: 767px)');
@@ -110,6 +126,14 @@ export default function AffiliatePage() {
 
   const filteredWithdrawals = withdrawFilterStatus === 'all' ? dummyWithdrawals : dummyWithdrawals.filter(w => w.status === withdrawFilterStatus);
   const totalEarnings = dummyUsers.filter(u => u.hasPurchased).reduce((sum, u) => sum + u.earnings, 0);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen gradient-bg flex items-center justify-center">
+        <div className="animate-pulse text-gray-500">Loading...</div>
+      </div>
+    );
+  }
 
   const cards = [
     { id: 'products', title: 'Listed Products', value: '24', icon: Package, color: 'from-blue-500 to-blue-600' },
@@ -200,7 +224,7 @@ export default function AffiliatePage() {
                   <>
                     <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:grid-cols-3 md:gap-6">
                       {visibleProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} isMobile={isMobileProducts} />
+                        <ProductCard key={product.id} product={product} referralCode={referralCode} isMobile={isMobileProducts} />
                       ))}
                     </div>
                     {hasMore && !showAllAffiliateProducts && (
@@ -440,13 +464,19 @@ export default function AffiliatePage() {
   );
 }
 
-function ProductCard({ product, isMobile = false }: { product: { id: number; name: string; image: string; price: number; commission: number; affiliateLink: string }; isMobile?: boolean }) {
+function getAffiliateProductUrl(productId: number, refCode: string): string {
+  if (typeof window === 'undefined') return `/product/${productId}?ref=${refCode}`;
+  return `${window.location.origin}/product/${productId}?ref=${refCode}`;
+}
+
+function ProductCard({ product, referralCode, isMobile = false }: { product: { id: number; name: string; image: string; price: number; commission: number }; referralCode: string; isMobile?: boolean }) {
   const [copied, setCopied] = useState(false);
+  const affiliateLink = getAffiliateProductUrl(product.id, referralCode);
   const handleCopy = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     try {
-      await navigator.clipboard.writeText(product.affiliateLink);
+      await navigator.clipboard.writeText(affiliateLink);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {}
@@ -456,7 +486,7 @@ function ProductCard({ product, isMobile = false }: { product: { id: number; nam
   return (
     <article className={cardBaseClass}>
       <Link
-        href={`/product/${product.id}`}
+        href={referralCode ? `/product/${product.id}?ref=${referralCode}` : `/product/${product.id}`}
         className="relative block aspect-square sm:aspect-[4/3] overflow-hidden bg-rose-50/60"
       >
         <img
@@ -481,7 +511,7 @@ function ProductCard({ product, isMobile = false }: { product: { id: number; nam
         </div>
         <div className="mt-3 flex flex-col gap-2 sm:mt-4 min-w-0">
           <div className={`flex items-center gap-2 min-w-0 ${isMobile ? 'justify-center md:justify-start' : ''} ${isMobile ? 'p-0 md:p-2 md:bg-gray-50 md:rounded-lg' : 'p-2 bg-gray-50 rounded-lg'}`}>
-            <input type="text" value={product.affiliateLink} readOnly className={`flex-1 min-w-0 text-[10px] sm:text-xs text-gray-600 bg-transparent border-none outline-none truncate ${isMobile ? 'hidden md:block' : ''}`} />
+            <input type="text" value={affiliateLink} readOnly className={`flex-1 min-w-0 text-[10px] sm:text-xs text-gray-600 bg-transparent border-none outline-none truncate ${isMobile ? 'hidden md:block' : ''}`} />
             <button
               type="button"
               onClick={handleCopy}

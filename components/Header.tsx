@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import ThemeSelector from './ThemeSelector';
 import Link from 'next/link';
 import { Search, User, ShoppingBag, Menu, X, Grid3x3, Heart, ChevronRight, ChevronDown, ChevronLeft, MapPin, Package, LogOut, Palette, IndianRupee, Users, TicketPercent } from 'lucide-react';
@@ -10,6 +10,7 @@ import { categories } from '../utils/categories';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -56,6 +57,9 @@ export default function Header() {
       const parsedProfile = profileData ? JSON.parse(profileData) : null;
       setUser({ ...parsedUser, ...parsedProfile });
       setIsAffiliate(!!localStorage.getItem('isAffiliate') || !!parsedProfile?.isAffiliate);
+    } else {
+      setUser(null);
+      setIsAffiliate(false);
     }
 
     // Function to update theme name
@@ -93,7 +97,7 @@ export default function Header() {
       window.removeEventListener('themeChanged', handleThemeChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (categoriesMenuOpen && categories.length > 0) setActiveCategory(categories[0].id);
@@ -342,7 +346,7 @@ export default function Header() {
                 <Palette className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />Color Theme
               </button>
               <Link href="/pricing" className="px-1.5 lg:px-2 xl:px-4 py-1 lg:py-1.5 xl:py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium text-xs lg:text-sm xl:text-base whitespace-nowrap flex items-center gap-1.5 lg:gap-2"><IndianRupee className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />Pricing</Link>
-              <Link href="/affiliate" className="px-1.5 lg:px-2 xl:px-4 py-1 lg:py-1.5 xl:py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium text-xs lg:text-sm xl:text-base whitespace-nowrap hidden xl:flex items-center gap-1.5 lg:gap-2"><Users className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />Affiliate</Link>
+              <Link href={!isLoggedIn ? '/login?redirect=' + encodeURIComponent('/affiliate/apply') : isAffiliate ? '/affiliate' : '/affiliate/apply'} className="px-1.5 lg:px-2 xl:px-4 py-1 lg:py-1.5 xl:py-2 text-gray-700 hover:text-pink-500 transition-colors font-medium text-xs lg:text-sm xl:text-base whitespace-nowrap hidden xl:flex items-center gap-1.5 lg:gap-2"><Users className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />{isAffiliate ? 'Affiliate' : 'Join Affiliate'}</Link>
               <Link href="/cart" className="relative flex items-center p-1 lg:p-1.5 xl:p-2">
                 <ShoppingBag className="w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 text-gray-700 hover:text-pink-500 cursor-pointer transition-colors" />
                 <span className="absolute -top-0.5 -right-0.5 lg:-top-1 lg:-right-1 xl:-top-2 xl:-right-2 bg-pink-500 text-white text-[9px] lg:text-[10px] xl:text-xs rounded-full w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-5 xl:h-5 flex items-center justify-center min-w-[14px] lg:min-w-[16px] xl:min-w-[20px]">{cartCount}</span>
@@ -496,12 +500,12 @@ export default function Header() {
                     Pricing
                   </Link>
                   <Link
-                    href="/affiliate"
+                    href={!isLoggedIn ? '/login?redirect=' + encodeURIComponent('/affiliate/apply') : isAffiliate ? '/affiliate' : '/affiliate/apply'}
                     className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-gray-700 hover:text-pink-500 hover:bg-white/50 transition-colors font-medium text-sm sm:text-base rounded-md"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                    Affiliate
+                    {isAffiliate ? 'Affiliate' : 'Join Affiliate'}
                   </Link>
                   <Link
                     href="/profile/my-coupons"
