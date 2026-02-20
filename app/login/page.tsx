@@ -53,13 +53,21 @@ async function verifyOtp(phone: string, otp: string) {
     return { success: false, message: remaining > 0 ? `Invalid OTP. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.` : 'Invalid OTP. Please request a new OTP.' };
   }
   clearOtpData();
-  const token = `mock-jwt-token-${Date.now()}-${phone}`;
-  const existingUser = localStorage.getItem(`user_${phone}`);
-  const userData = { id: existingUser ? JSON.parse(existingUser).id : `user_${Date.now()}`, phone, createdAt: existingUser ? JSON.parse(existingUser).createdAt : new Date().toISOString() };
-  localStorage.setItem(`user_${phone}`, JSON.stringify(userData));
-  localStorage.setItem('authToken', token);
-  localStorage.setItem('user', JSON.stringify({ phone, id: userData.id }));
-  return { success: true, message: !existingUser ? 'Account created successfully!' : 'Login successful!', token, user: { id: userData.id, phone, isNewUser: !existingUser } };
+  const existingUserJson = localStorage.getItem(`user_${phone}`);
+  const existingUser = existingUserJson ? JSON.parse(existingUserJson) : null;
+  const isRegistered = existingUser && (existingUser.registered === true || existingUser.role != null);
+
+  if (isRegistered) {
+    const token = `mock-jwt-token-${Date.now()}-${phone}`;
+    const userData = { id: existingUser.id, phone, createdAt: existingUser.createdAt };
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('user', JSON.stringify({ phone, id: userData.id, role: existingUser.role }));
+    return { success: true, message: 'Login successful!', token, user: { id: userData.id, phone, isNewUser: false } };
+  }
+
+  sessionStorage.setItem('register_phone', phone);
+  sessionStorage.setItem('register_verified_at', Date.now().toString());
+  return { success: true, message: 'OTP verified. Please complete registration.', user: { phone, isNewUser: true } };
 }
 
 function clearOtpData() {
@@ -140,8 +148,12 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const response = await verifyOtp(phone, otp);
-      if (response.success && response.token && response.user) router.push('/');
-      else setOtpError(response.message || 'Invalid OTP. Please try again.');
+      if (response.success && response.user) {
+        if (response.user.isNewUser) router.push(`/auth/register?phone=${encodeURIComponent(phone)}`);
+        else if (response.token) router.push('/');
+        return;
+      }
+      setOtpError(response.message || 'Invalid OTP. Please try again.');
     } catch { setOtpError('Something went wrong. Please try again.'); } finally { setIsLoading(false); }
   };
 
