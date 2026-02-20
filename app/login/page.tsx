@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader, Phone } from 'lucide-react';
 
 const OTP_STORAGE_KEY = 'tb_otp';
@@ -62,6 +62,23 @@ async function verifyOtp(phone: string, otp: string) {
     const userData = { id: existingUser.id, phone, createdAt: existingUser.createdAt };
     localStorage.setItem('authToken', token);
     localStorage.setItem('user', JSON.stringify({ phone, id: userData.id, role: existingUser.role }));
+    const existingProfile = (() => {
+      try {
+        const p = localStorage.getItem('profile');
+        return p ? JSON.parse(p) : {};
+      } catch { return {}; }
+    })();
+    const profile = {
+      ...existingProfile,
+      name: existingUser.name ?? existingProfile.name,
+      email: existingUser.email ?? existingProfile.email,
+      phone: existingUser.phone ?? existingProfile.phone,
+      isAffiliate: existingUser.isAffiliate ?? existingProfile.isAffiliate,
+      referralCode: existingUser.referralCode ?? existingProfile.referralCode,
+      affiliateStatus: existingUser.affiliateStatus ?? existingProfile.affiliateStatus,
+    };
+    localStorage.setItem('profile', JSON.stringify(profile));
+    if (profile.isAffiliate) localStorage.setItem('isAffiliate', 'true');
     return { success: true, message: 'Login successful!', token, user: { id: userData.id, phone, isNewUser: false } };
   }
 
@@ -79,8 +96,17 @@ function clearOtpData() {
 
 type Step = 'phone' | 'otp';
 
+function getRedirectPath(redirect: string | null): string | null {
+  if (!redirect || typeof redirect !== 'string') return null;
+  const path = redirect.startsWith('/') ? redirect : `/${redirect}`;
+  if (!path.startsWith('/') || path.startsWith('//')) return null;
+  return path;
+}
+
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = getRedirectPath(searchParams.get('redirect'));
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
@@ -150,7 +176,7 @@ export default function LoginPage() {
       const response = await verifyOtp(phone, otp);
       if (response.success && response.user) {
         if (response.user.isNewUser) router.push(`/auth/register?phone=${encodeURIComponent(phone)}`);
-        else if (response.token) router.push('/');
+        else if (response.token) router.push(redirectTo || '/');
         return;
       }
       setOtpError(response.message || 'Invalid OTP. Please try again.');
