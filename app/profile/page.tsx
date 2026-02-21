@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Link from 'next/link';
-import { Check, Save, Plus, Edit, Trash2, Mail, Shield, Bell, CheckCircle, XCircle, Clock, Upload, FileText, User, MapPin, ArrowLeft, Store } from 'lucide-react';
+import { Check, Save, Plus, Edit, Trash2, Mail, Shield, Bell, CheckCircle, XCircle, Clock, Upload, FileText, User, MapPin, ArrowLeft } from 'lucide-react';
 
 const categories = [
   { id: 1, name: 'Skincare', href: '/category/skincare', items: [{ id: 1, name: 'Face Wash & Cleansers', href: '/category/skincare/cleansers' }, { id: 2, name: 'Moisturizers', href: '/category/skincare/moisturizers' }, { id: 3, name: 'Serums & Essences', href: '/category/skincare/serums' }, { id: 4, name: 'Sunscreen & SPF', href: '/category/skincare/sunscreen' }, { id: 5, name: 'Toners & Mists', href: '/category/skincare/toners' }, { id: 6, name: 'Face Masks', href: '/category/skincare/masks' }, { id: 7, name: 'Eye Care', href: '/category/skincare/eye-care' }, { id: 8, name: 'Anti-Aging', href: '/category/skincare/anti-aging' }] },
@@ -287,23 +287,6 @@ export default function ProfilePage() {
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"><div><p className="text-sm font-medium text-gray-800">Email Notifications</p><p className="text-xs text-gray-600">Receive updates via email</p></div><label className="relative inline-flex items-center cursor-pointer"><input type="checkbox" className="sr-only peer" defaultChecked /><div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-rose-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div></label></div>
                       </div>
                     </div>
-                    {(user?.role === 'Customer' || !user?.role) && (
-                      <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-rose-100/80 p-4 sm:p-6 md:p-8">
-                        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6"><Store className="w-5 h-5 sm:w-6 sm:h-6 text-rose-500" /><h2 className="text-lg sm:text-xl md:text-2xl font-playfair font-bold text-gray-800">Sell on True Beauty</h2></div>
-                        <div className="space-y-4">
-                          {user?.sellerStatus === 'pending' ? (
-                            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                              <p className="text-sm font-medium text-amber-800 mb-1">Seller application under review</p>
-                              <p className="text-xs text-amber-700">We will notify you once it is approved.</p>
-                            </div>
-                          ) : (
-                            <Link href="/profile/seller/apply" className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-gradient-to-r from-[#FF3C8C] to-[#FF0066] text-white rounded-lg font-medium hover:opacity-95 transition-all shadow-md hover:shadow-lg">
-                              <Store className="w-5 h-5" /> Become Seller
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    )}
                     {showAddressForm ? <AddressFormInline address={editingAddress} onSave={handleAddressSave} onCancel={() => { setShowAddressForm(false); setEditingAddress(null); }} /> : (
                       <div id="addresses" className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-rose-100/80 p-4 sm:p-6 md:p-8">
                         <div className="flex flex-row items-center justify-between gap-3 mb-4 sm:mb-6">
