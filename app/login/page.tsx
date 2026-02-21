@@ -121,6 +121,15 @@ function LoginForm() {
   const demoAutofillTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { clearOtpData(); }, []);
+  // If already logged in and came with a redirect (e.g. Join Affiliate), go directly to that page
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const token = localStorage.getItem('authToken');
+    const user = localStorage.getItem('user');
+    if (token && user && redirectTo) {
+      router.replace(redirectTo);
+    }
+  }, [redirectTo, router]);
   useEffect(() => () => {
     if (demoAutofillTimeoutRef.current) clearTimeout(demoAutofillTimeoutRef.current);
   }, []);
