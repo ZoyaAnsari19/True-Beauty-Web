@@ -17,18 +17,10 @@ import {
 } from '../../../utils/coupons';
 
 const COUPON_STORAGE_KEY = 'tb_cart_coupon';
-const ORDERS_STORAGE_KEY = 'tb_orders';
 
+import type { StoredOrder, ShippingAddress } from '../../../utils/orders';
+import { ORDERS_STORAGE_KEY } from '../../../utils/orders';
 type CartItem = { id: number; name: string; price: number; image: string; quantity: number };
-
-export type StoredOrder = {
-  orderId: string;
-  placedAt: string;
-  items: CartItem[];
-  subtotal: number;
-  discount: number;
-  total: number;
-};
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -78,13 +70,16 @@ export default function PaymentPage() {
       const subtotal = cart.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0);
       const total = Math.max(0, subtotal - discount);
 
+      const placedAt = new Date().toISOString();
       const order: StoredOrder = {
         orderId,
-        placedAt: new Date().toISOString(),
+        placedAt,
         items: cart,
         subtotal,
         discount,
         total,
+        status: 'pending',
+        timeline: [{ at: placedAt, status: 'pending', label: 'Order placed' }],
       };
 
       createRewardCouponAfterOrder(cart);
