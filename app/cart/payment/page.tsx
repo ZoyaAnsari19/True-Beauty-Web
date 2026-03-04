@@ -71,6 +71,24 @@ export default function PaymentPage() {
       const total = Math.max(0, subtotal - discount);
 
       const placedAt = new Date().toISOString();
+      let shippingAddress: ShippingAddress | undefined;
+      try {
+        const addrRaw = localStorage.getItem('tb_shipping_address');
+        if (addrRaw) {
+          const addr = JSON.parse(addrRaw);
+          if (addr && typeof addr.name === 'string' && typeof addr.phone === 'string') {
+            shippingAddress = {
+              name: addr.name,
+              phone: addr.phone,
+              addressLine1: addr.addressLine1 || '',
+              addressLine2: addr.addressLine2,
+              city: addr.city || '',
+              state: addr.state || '',
+              pincode: addr.pincode || '',
+            };
+          }
+        }
+      } catch (_) {}
       const order: StoredOrder = {
         orderId,
         placedAt,
@@ -80,6 +98,8 @@ export default function PaymentPage() {
         total,
         status: 'pending',
         timeline: [{ at: placedAt, status: 'pending', label: 'Order placed' }],
+        paymentMethod: 'Online',
+        shippingAddress,
       };
 
       createRewardCouponAfterOrder(cart);
