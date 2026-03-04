@@ -313,6 +313,15 @@ export default function ProductPage() {
                     </button>
                   )}
                 </div>
+                <div className="mt-6 pt-6 border-t border-rose-100">
+                  <h3 className="text-sm font-semibold text-gray-800 mb-2">Return &amp; Exchange Policy</h3>
+                  <ul className="text-xs text-gray-600 space-y-1">
+                    <li>• Easy returns within 14 days of delivery for unused, unopened products.</li>
+                    <li>• Exchange for a different size/variant within 14 days; subject to availability.</li>
+                    <li>• Initiate from &quot;My Orders&quot; → Order Details after delivery.</li>
+                    <li>• Refunds are processed to the original payment method within 5–7 business days.</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
